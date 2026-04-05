@@ -79,5 +79,35 @@ a2a_app = create_a2a_app(
             description="Check allergy cross-reactivity with current meds and perioperative drugs. Includes surgical prophylaxis alternatives.",
             tags=["allergy", "cross-reactivity", "safety"],
         ),
+        AgentSkill(
+            id="antibiotic-prophylaxis",
+            name="antibiotic-prophylaxis",
+            description="Select surgical antibiotic prophylaxis with dose, timing, and allergy-based alternatives.",
+            tags=["antibiotics", "prophylaxis", "surgery"],
+        ),
+        AgentSkill(
+            id="blood-product-anticipation",
+            name="blood-product-anticipation",
+            description="Predict blood product needs — crossmatch units, transfusion thresholds, cell saver recommendation.",
+            tags=["blood", "transfusion", "anemia"],
+        ),
+        AgentSkill(
+            id="frailty-assessment",
+            name="frailty-assessment",
+            description="Assess patient frailty using FRAIL scale with prehabilitation recommendations.",
+            tags=["frailty", "geriatric", "prehabilitation"],
+        ),
+        AgentSkill(
+            id="patient-education",
+            name="patient-education",
+            description="Generate plain-language pre-op instructions for the patient — fasting, meds, what to bring.",
+            tags=["education", "patient", "instructions"],
+        ),
+        AgentSkill(
+            id="surgical-safety-checklist",
+            name="surgical-safety-checklist",
+            description="Generate WHO-style surgical safety checklist with patient-specific safety flags.",
+            tags=["checklist", "safety", "WHO"],
+        ),
     ],
 )

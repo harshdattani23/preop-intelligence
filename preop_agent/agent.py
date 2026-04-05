@@ -19,6 +19,11 @@ from .tools import (
     check_drug_interactions_a2a,
     calculate_renal_dose_adjustments_a2a,
     check_allergy_cross_reactivity_a2a,
+    select_antibiotic_prophylaxis_a2a,
+    anticipate_blood_products_a2a,
+    assess_frailty_a2a,
+    generate_patient_education_a2a,
+    generate_surgical_checklist_a2a,
 )
 
 root_agent = Agent(
@@ -63,6 +68,11 @@ root_agent = Agent(
         check_drug_interactions_a2a,
         calculate_renal_dose_adjustments_a2a,
         check_allergy_cross_reactivity_a2a,
+        select_antibiotic_prophylaxis_a2a,
+        anticipate_blood_products_a2a,
+        assess_frailty_a2a,
+        generate_patient_education_a2a,
+        generate_surgical_checklist_a2a,
     ],
     before_model_callback=extract_fhir_context,
 )
