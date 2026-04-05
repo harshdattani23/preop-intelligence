@@ -61,5 +61,23 @@ a2a_app = create_a2a_app(
             description="Calculate advanced scores: CHA₂DS₂-VASc (stroke), MELD-Na (liver), Wells (DVT), HEART (chest pain), LEMON (airway), GCS (neuro), P-POSSUM (surgical mortality).",
             tags=["risk-scores", "cha2ds2vasc", "meld", "wells", "heart", "lemon", "possum"],
         ),
+        AgentSkill(
+            id="drug-interactions",
+            name="drug-interactions",
+            description="Check all active medications for drug-drug interactions with severity, mechanisms, and perioperative recommendations.",
+            tags=["medications", "interactions", "safety"],
+        ),
+        AgentSkill(
+            id="renal-dose-adjustment",
+            name="renal-dose-adjustment",
+            description="Calculate renal dose adjustments based on eGFR for all active medications.",
+            tags=["renal", "dosing", "gfr", "ckd"],
+        ),
+        AgentSkill(
+            id="allergy-cross-reactivity",
+            name="allergy-cross-reactivity",
+            description="Check allergy cross-reactivity with current meds and perioperative drugs. Includes surgical prophylaxis alternatives.",
+            tags=["allergy", "cross-reactivity", "safety"],
+        ),
     ],
 )
