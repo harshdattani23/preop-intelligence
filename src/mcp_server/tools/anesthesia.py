@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-from datetime import date
 from typing import Annotated
 
 from src.mcp_server.fhir_client import FHIRClient

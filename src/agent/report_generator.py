@@ -98,16 +98,16 @@ class ReportGenerator:
             med_names = ", ".join(m.medication_name for m in critical_meds)
             flags.append(f"ANTICOAGULATION MANAGEMENT REQUIRED — {med_names}")
 
-        critical_labs = [l for l in labs.labs_abnormal if l.status == "critical"]
+        critical_labs = [lab for lab in labs.labs_abnormal if lab.status == "critical"]
         if critical_labs:
-            lab_names = ", ".join(f"{l.test_name}: {l.value} {l.unit}" for l in critical_labs)
+            lab_names = ", ".join(f"{lab.test_name}: {lab.value} {lab.unit}" for lab in critical_labs)
             flags.append(f"CRITICAL LAB VALUES — {lab_names}")
 
         if labs.labs_missing:
             flags.append(f"MISSING REQUIRED LABS — {', '.join(labs.labs_missing)}")
 
         if labs.labs_expired:
-            expired_names = ", ".join(l.test_name for l in labs.labs_expired)
+            expired_names = ", ".join(lab.test_name for lab in labs.labs_expired)
             flags.append(f"EXPIRED LABS — must repeat: {expired_names}")
 
         if anesthesia.airway_risk == "high":

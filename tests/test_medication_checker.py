@@ -54,7 +54,6 @@ async def test_patient_d_herbal_supplements():
     ))
     assert isinstance(result, list)
     # Should flag apixaban and herbal supplements
-    actions = {r["medication_name"].lower(): r["action"] for r in result}
     # Apixaban should be held
     apixaban_entries = [r for r in result if "apixaban" in r["medication_name"].lower()]
     assert len(apixaban_entries) >= 1

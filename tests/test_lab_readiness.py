@@ -28,7 +28,7 @@ async def test_patient_c_abnormal_labs():
     ))
     # Patient C has abnormal creatinine (2.3) and hemoglobin (10.2)
     assert len(result["labs_abnormal"]) >= 2
-    abnormal_names = [l["test_name"] for l in result["labs_abnormal"]]
+    abnormal_names = [lab["test_name"] for lab in result["labs_abnormal"]]
     assert "Creatinine" in abnormal_names or "Hemoglobin" in abnormal_names
 
 

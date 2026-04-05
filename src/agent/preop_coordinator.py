@@ -9,7 +9,6 @@ import os
 from dotenv import load_dotenv
 
 from src.agent.report_generator import ReportGenerator
-from src.mcp_server.fhir_client import FHIRClient
 from src.mcp_server.models import (
     AnesthesiaAssessment,
     LabReadinessReport,
@@ -144,7 +143,7 @@ async def main():
         print(f"STOP-BANG: {report.risk_assessment.stop_bang.score_value} ({report.risk_assessment.stop_bang.risk_level})")
 
         if report.escalation_flags:
-            print(f"\nESCALATION FLAGS:")
+            print("\nESCALATION FLAGS:")
             for flag in report.escalation_flags:
                 print(f"  ⚠ {flag}")
 

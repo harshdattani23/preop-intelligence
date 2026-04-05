@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from datetime import date, datetime
 from typing import Annotated
 
@@ -238,8 +237,6 @@ async def assess_lab_readiness(
         coll_date = _parse_date(collection_date)
         days_old = (ref_date - coll_date).days if coll_date else 999
         is_expired = days_old > 30
-        borderline = 30 < days_old <= 90
-
         status = _check_abnormal(loinc_code, value)
 
         lab_result = LabResult(
@@ -263,7 +260,7 @@ async def assess_lab_readiness(
             labs_abnormal.append(lab_result)
 
     overall_ready = len(labs_missing) == 0 and len(labs_expired) == 0 and not any(
-        l.status == "critical" for l in labs_abnormal
+        lab.status == "critical" for lab in labs_abnormal
     )
 
     report = LabReadinessReport(
