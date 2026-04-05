@@ -1,0 +1,378 @@
+{
+  "anticoagulants": {
+    "warfarin": {
+      "names": ["warfarin", "coumadin", "jantoven"],
+      "rxnorm_codes": ["855332", "855334", "855336"],
+      "action": "hold",
+      "hold_days": 5,
+      "details": "Hold 5 days pre-op. Check INR day before surgery (target <1.5). Bridge with LMWH if high thrombotic risk (mechanical valve, recent DVT/PE <3mo, AFib with prior stroke).",
+      "urgency": "critical",
+      "resume": "Resume evening of POD 0-1 if adequate hemostasis"
+    },
+    "apixaban": {
+      "names": ["apixaban", "eliquis"],
+      "rxnorm_codes": ["1364430", "1364435"],
+      "action": "hold",
+      "hold_days": 2,
+      "details": "Hold 48 hours pre-op (72 hours if CrCl <25 mL/min or high-bleed-risk procedure). No bridging required.",
+      "urgency": "critical",
+      "resume": "Resume 48-72 hours post-op when hemostasis is confirmed"
+    },
+    "rivaroxaban": {
+      "names": ["rivaroxaban", "xarelto"],
+      "rxnorm_codes": ["1114195", "1232082"],
+      "action": "hold",
+      "hold_days": 2,
+      "details": "Hold 48 hours pre-op (72 hours if CrCl <30 mL/min or high-bleed-risk procedure). No bridging required.",
+      "urgency": "critical",
+      "resume": "Resume 48-72 hours post-op when hemostasis is confirmed"
+    },
+    "dabigatran": {
+      "names": ["dabigatran", "pradaxa"],
+      "rxnorm_codes": ["1037045", "1037042"],
+      "action": "hold",
+      "hold_days": 2,
+      "details": "Hold 48 hours pre-op if CrCl >50 mL/min; hold 4-5 days if CrCl <50 mL/min. Reversal agent idarucizumab (Praxbind) available for emergencies. No bridging required.",
+      "urgency": "critical",
+      "resume": "Resume 48-72 hours post-op when hemostasis is confirmed"
+    },
+    "enoxaparin": {
+      "names": ["enoxaparin", "lovenox"],
+      "rxnorm_codes": ["854228", "854232", "854238"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold therapeutic dose 24 hours pre-op; hold prophylactic dose 12 hours pre-op. Check anti-Xa level if renal impairment.",
+      "urgency": "critical",
+      "resume": "Resume prophylactic dose 12-24 hours post-op; therapeutic dose 48-72 hours post-op if hemostasis confirmed"
+    }
+  },
+  "antiplatelets": {
+    "aspirin": {
+      "names": ["aspirin", "asa", "acetylsalicylic acid", "ecotrin", "bayer aspirin"],
+      "rxnorm_codes": ["1191", "212033"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue for patients with cardiac stents or high cardiovascular risk. For primary prevention or non-cardiac indications, discuss with surgeon; may hold 7 days pre-op if bleeding risk outweighs cardiac benefit.",
+      "urgency": "important",
+      "resume": "Continue perioperatively for cardiac patients; restart POD 0-1 if held"
+    },
+    "clopidogrel": {
+      "names": ["clopidogrel", "plavix"],
+      "rxnorm_codes": ["32968", "174742"],
+      "action": "hold",
+      "hold_days": 5,
+      "details": "Hold 5 days pre-op for elective surgery. Do NOT discontinue within 6 months of bare-metal stent or 12 months of drug-eluting stent placement without cardiology consultation.",
+      "urgency": "critical",
+      "resume": "Resume POD 1 with loading dose if appropriate, per cardiology guidance"
+    },
+    "prasugrel": {
+      "names": ["prasugrel", "effient"],
+      "rxnorm_codes": ["855812", "855818"],
+      "action": "hold",
+      "hold_days": 7,
+      "details": "Hold 7 days pre-op for elective surgery. Do NOT discontinue within 12 months of drug-eluting stent placement without cardiology consultation.",
+      "urgency": "critical",
+      "resume": "Resume POD 1 with loading dose if appropriate, per cardiology guidance"
+    },
+    "ticagrelor": {
+      "names": ["ticagrelor", "brilinta"],
+      "rxnorm_codes": ["1116632", "1116634"],
+      "action": "hold",
+      "hold_days": 5,
+      "details": "Hold 5 days pre-op for elective surgery. Do NOT discontinue within 12 months of drug-eluting stent placement without cardiology consultation.",
+      "urgency": "critical",
+      "resume": "Resume POD 1 per cardiology guidance"
+    }
+  },
+  "diabetes": {
+    "metformin": {
+      "names": ["metformin", "glucophage", "glucophage xr", "glumetza", "riomet"],
+      "rxnorm_codes": ["6809", "861004", "861007"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. Risk of lactic acidosis with contrast dye or renal hypoperfusion. Hold 48 hours if IV contrast planned.",
+      "urgency": "important",
+      "resume": "Resume when tolerating oral intake and renal function is stable post-op"
+    },
+    "insulin_glargine": {
+      "names": ["insulin glargine", "lantus", "basaglar", "toujeo", "semglee"],
+      "rxnorm_codes": ["261542", "847230", "847232"],
+      "action": "adjust",
+      "hold_days": 0,
+      "details": "Reduce dose by 20-25% the evening before or morning of surgery. Do NOT hold completely to avoid DKA in Type 1 diabetics. Monitor blood glucose every 1-2 hours perioperatively.",
+      "urgency": "critical",
+      "resume": "Resume home dose when eating normally; use sliding scale insulin until then"
+    },
+    "insulin_lispro": {
+      "names": ["insulin lispro", "humalog", "admelog", "lyumjev"],
+      "rxnorm_codes": ["86009", "847187", "847191"],
+      "action": "hold",
+      "hold_days": 0,
+      "details": "Hold on morning of surgery (mealtime insulin not needed while NPO). Cover with sliding scale as needed perioperatively.",
+      "urgency": "important",
+      "resume": "Resume when patient is eating regular meals post-op"
+    },
+    "glipizide": {
+      "names": ["glipizide", "glucotrol", "glucotrol xl"],
+      "rxnorm_codes": ["4821", "310488", "310489"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. Sulfonylureas cause hypoglycemia during fasting. Monitor blood glucose perioperatively.",
+      "urgency": "important",
+      "resume": "Resume when tolerating oral intake post-op"
+    },
+    "glyburide": {
+      "names": ["glyburide", "glibenclamide", "diabeta", "micronase", "glynase"],
+      "rxnorm_codes": ["4815", "310534", "310537"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. Longest-acting sulfonylurea with highest hypoglycemia risk. Consider holding evening before surgery. Monitor blood glucose.",
+      "urgency": "important",
+      "resume": "Resume when tolerating oral intake post-op"
+    },
+    "empagliflozin": {
+      "names": ["empagliflozin", "jardiance"],
+      "rxnorm_codes": ["1545653", "1545658"],
+      "action": "hold",
+      "hold_days": 3,
+      "details": "Hold 3-4 days pre-op. SGLT2 inhibitors carry risk of euglycemic diabetic ketoacidosis (DKA) perioperatively. Check ketones if glucose >250 or patient symptomatic.",
+      "urgency": "critical",
+      "resume": "Resume when eating normally and clinically stable, typically POD 2-3"
+    },
+    "dapagliflozin": {
+      "names": ["dapagliflozin", "farxiga"],
+      "rxnorm_codes": ["1486436", "1486981"],
+      "action": "hold",
+      "hold_days": 3,
+      "details": "Hold 3-4 days pre-op. SGLT2 inhibitors carry risk of euglycemic DKA perioperatively. Check ketones if glucose >250 or patient symptomatic.",
+      "urgency": "critical",
+      "resume": "Resume when eating normally and clinically stable, typically POD 2-3"
+    },
+    "semaglutide": {
+      "names": ["semaglutide", "ozempic", "wegovy", "rybelsus"],
+      "rxnorm_codes": ["1991302", "2169285", "2395279"],
+      "action": "hold",
+      "hold_days": 7,
+      "details": "Hold 7 days (weekly injection) pre-op per ASA 2023 guidance. GLP-1 agonists delay gastric emptying, increasing aspiration risk under anesthesia. Consider gastric ultrasound if not held.",
+      "urgency": "critical",
+      "resume": "Resume at next scheduled weekly dose when tolerating oral intake"
+    },
+    "liraglutide": {
+      "names": ["liraglutide", "victoza", "saxenda"],
+      "rxnorm_codes": ["897122", "1598268"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold day of surgery. Daily GLP-1 agonist that delays gastric emptying, increasing aspiration risk. Consider gastric ultrasound if not held appropriately.",
+      "urgency": "important",
+      "resume": "Resume when tolerating oral intake post-op"
+    }
+  },
+  "ace_inhibitors_arbs": {
+    "lisinopril": {
+      "names": ["lisinopril", "prinivil", "zestril"],
+      "rxnorm_codes": ["29046", "314076", "314077"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. ACE inhibitors may cause refractory hypotension under anesthesia. Continue if primary indication is heart failure with reduced EF.",
+      "urgency": "important",
+      "resume": "Resume POD 1-2 when hemodynamically stable and euvolemic"
+    },
+    "enalapril": {
+      "names": ["enalapril", "vasotec", "epaned"],
+      "rxnorm_codes": ["3827", "310422", "310423"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. ACE inhibitors may cause refractory hypotension under anesthesia. Continue if primary indication is heart failure with reduced EF.",
+      "urgency": "important",
+      "resume": "Resume POD 1-2 when hemodynamically stable and euvolemic"
+    },
+    "losartan": {
+      "names": ["losartan", "cozaar"],
+      "rxnorm_codes": ["52175", "979467", "979471"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. ARBs may cause refractory hypotension under anesthesia. Continue if primary indication is heart failure with reduced EF.",
+      "urgency": "important",
+      "resume": "Resume POD 1-2 when hemodynamically stable and euvolemic"
+    },
+    "valsartan": {
+      "names": ["valsartan", "diovan"],
+      "rxnorm_codes": ["69749", "349199", "349201"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery. ARBs may cause refractory hypotension under anesthesia. Continue if primary indication is heart failure with reduced EF.",
+      "urgency": "important",
+      "resume": "Resume POD 1-2 when hemodynamically stable and euvolemic"
+    }
+  },
+  "beta_blockers": {
+    "metoprolol": {
+      "names": ["metoprolol", "metoprolol tartrate", "metoprolol succinate", "lopressor", "toprol xl"],
+      "rxnorm_codes": ["6918", "866412", "866418", "866427"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Abrupt withdrawal risks rebound tachycardia, hypertension, and myocardial ischemia. Cardioprotective in perioperative setting.",
+      "urgency": "critical",
+      "resume": "Continue without interruption; give with sip of water morning of surgery"
+    },
+    "atenolol": {
+      "names": ["atenolol", "tenormin"],
+      "rxnorm_codes": ["1202", "197381", "197382"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Abrupt withdrawal risks rebound tachycardia and myocardial ischemia. Administer morning of surgery with sip of water.",
+      "urgency": "critical",
+      "resume": "Continue without interruption; convert to IV if unable to take PO"
+    },
+    "carvedilol": {
+      "names": ["carvedilol", "coreg", "coreg cr"],
+      "rxnorm_codes": ["20352", "200031", "200033"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Abrupt withdrawal risks rebound tachycardia and worsening heart failure. Administer morning of surgery with sip of water.",
+      "urgency": "critical",
+      "resume": "Continue without interruption; use alternative IV beta-blocker if unable to take PO"
+    }
+  },
+  "statins": {
+    "atorvastatin": {
+      "names": ["atorvastatin", "lipitor"],
+      "rxnorm_codes": ["83367", "259255", "617311"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Statins have pleiotropic anti-inflammatory and plaque-stabilizing effects that are cardioprotective in the surgical setting.",
+      "urgency": "routine",
+      "resume": "Continue without interruption"
+    },
+    "rosuvastatin": {
+      "names": ["rosuvastatin", "crestor", "ezallor"],
+      "rxnorm_codes": ["301542", "859747", "859751"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Statins have pleiotropic anti-inflammatory and plaque-stabilizing effects that are cardioprotective in the surgical setting.",
+      "urgency": "routine",
+      "resume": "Continue without interruption"
+    },
+    "simvastatin": {
+      "names": ["simvastatin", "zocor"],
+      "rxnorm_codes": ["36567", "104490", "104491"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Statins have pleiotropic anti-inflammatory and plaque-stabilizing effects that are cardioprotective in the surgical setting.",
+      "urgency": "routine",
+      "resume": "Continue without interruption"
+    }
+  },
+  "herbal_supplements": {
+    "st_johns_wort": {
+      "names": ["st. john's wort", "st johns wort", "hypericum perforatum", "saint john's wort"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 5,
+      "details": "Stop 5 days pre-op. Induces CYP3A4 and P-glycoprotein, reducing efficacy of many anesthetic and perioperative drugs (midazolam, fentanyl, cyclosporine, warfarin).",
+      "urgency": "important",
+      "resume": "May resume post-op when no longer taking interacting medications"
+    },
+    "ginkgo_biloba": {
+      "names": ["ginkgo biloba", "ginkgo", "ginkgo extract"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. Inhibits platelet-activating factor (PAF) and may potentiate bleeding, especially when combined with anticoagulants or antiplatelets.",
+      "urgency": "important",
+      "resume": "May resume when surgical wound is healing and hemostasis is confirmed"
+    },
+    "garlic_supplement": {
+      "names": ["garlic supplement", "garlic extract", "allium sativum", "garlic capsule"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. Inhibits platelet aggregation and may increase bleeding risk. Also potentiates effects of anticoagulants and antihypertensives.",
+      "urgency": "important",
+      "resume": "May resume when surgical wound is healing and hemostasis is confirmed"
+    },
+    "ginger": {
+      "names": ["ginger supplement", "ginger extract", "ginger root", "zingiber officinale"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. May inhibit thromboxane synthetase and platelet aggregation, increasing bleeding risk perioperatively.",
+      "urgency": "routine",
+      "resume": "May resume when surgical wound is healing"
+    },
+    "fish_oil": {
+      "names": ["fish oil", "omega-3 fatty acids", "omega 3", "epa/dha", "lovaza", "vascepa", "icosapent ethyl"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. High-dose omega-3 fatty acids may impair platelet aggregation and prolong bleeding time, though recent evidence suggests modest risk.",
+      "urgency": "routine",
+      "resume": "May resume when surgical wound is healing"
+    },
+    "ephedra": {
+      "names": ["ephedra", "ma huang", "ephedra sinica", "ephedrine supplement"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop at least 7 days pre-op. Sympathomimetic effects cause tachycardia, hypertension, and arrhythmias. Risk of hemodynamic instability and myocardial ischemia under anesthesia.",
+      "urgency": "critical",
+      "resume": "Strongly discourage resumption; discuss risks with patient"
+    },
+    "kava": {
+      "names": ["kava", "kava kava", "piper methysticum"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. Potentiates GABAergic sedation and may prolong effects of anesthetics. Associated with hepatotoxicity.",
+      "urgency": "important",
+      "resume": "May resume post-op; counsel patient on hepatotoxicity risk"
+    },
+    "valerian": {
+      "names": ["valerian", "valerian root", "valeriana officinalis"],
+      "rxnorm_codes": [],
+      "action": "stop",
+      "hold_days": 7,
+      "details": "Stop 7 days pre-op. GABA-ergic mechanism may potentiate sedative effects of anesthetics. Abrupt withdrawal after chronic use may cause benzodiazepine-like withdrawal.",
+      "urgency": "important",
+      "resume": "Taper gradually if chronic use; may resume post-op if no interactions with current medications"
+    }
+  },
+  "other": {
+    "furosemide": {
+      "names": ["furosemide", "lasix"],
+      "rxnorm_codes": ["4603", "200801", "200800"],
+      "action": "hold",
+      "hold_days": 1,
+      "details": "Hold morning of surgery to avoid intraoperative hypovolemia and electrolyte imbalances. Check potassium and magnesium pre-op. Continue if needed for active heart failure management.",
+      "urgency": "important",
+      "resume": "Resume POD 0-1 when volume status and electrolytes are assessed"
+    },
+    "albuterol": {
+      "names": ["albuterol", "salbutamol", "proventil", "ventolin", "proair"],
+      "rxnorm_codes": ["435", "745678", "745679"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Bring inhaler to hospital. Administer pre-op nebulizer treatment for patients with reactive airway disease or active wheezing.",
+      "urgency": "routine",
+      "resume": "Continue without interruption; ensure available in PACU"
+    },
+    "levothyroxine": {
+      "names": ["levothyroxine", "synthroid", "levoxyl", "tirosint", "unithroid"],
+      "rxnorm_codes": ["10582", "966222", "966225"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Long half-life (7 days) means missing one dose has minimal clinical impact, but routine continuation is preferred. Take morning of surgery with sip of water.",
+      "urgency": "routine",
+      "resume": "Continue without interruption"
+    },
+    "prednisone": {
+      "names": ["prednisone", "deltasone", "rayos"],
+      "rxnorm_codes": ["8640", "312615", "312617"],
+      "action": "continue",
+      "hold_days": 0,
+      "details": "Continue perioperatively. Do NOT abruptly discontinue due to adrenal suppression risk. Patients on >5 mg/day for >3 weeks may need stress-dose steroids (hydrocortisone 50-100 mg IV) for major surgery.",
+      "urgency": "critical",
+      "resume": "Continue home dose; taper stress-dose steroids over 1-3 days post-op if given"
+    }
+  }
+}
