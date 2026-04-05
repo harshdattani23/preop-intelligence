@@ -13,7 +13,9 @@ import src.mcp_server.tools.anesthesia  # noqa: F401
 
 
 def main():
-    mcp.run(transport="stdio")
+    import os
+    port = int(os.getenv("PORT", "8080"))
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=port)
 
 
 if __name__ == "__main__":
