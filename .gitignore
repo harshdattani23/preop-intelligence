@@ -10,3 +10,6 @@ build/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+demo/batch_*
+demo/Burl285_*
+demo/demo_patient_*
