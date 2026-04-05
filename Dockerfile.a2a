@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r requirements-a2a.txt
 
 COPY shared/ shared/
 COPY preop_agent/ preop_agent/
-COPY src/data/ src/data/
+COPY src/ src/
 
 ENV PORT=8080
 ENV AGENT_MODULE=preop_agent.app:a2a_app

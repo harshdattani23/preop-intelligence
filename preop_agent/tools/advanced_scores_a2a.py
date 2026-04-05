@@ -1,18 +1,11 @@
-"""Advanced clinical scoring systems as A2A tools (Google ADK).
-
-Wraps the same scoring logic from the MCP module for use in A2A agents.
-Reads FHIR context from tool_context.state.
-"""
+"""Advanced clinical scoring systems as A2A tools (Google ADK)."""
 
 import logging
 
 import httpx
 from google.adk.tools import ToolContext
 
-logger = logging.getLogger(__name__)
-
-# Import all calculators from the MCP module
-from src.mcp_server.tools.advanced_scores import (
+from src.scoring.calculators import (
     _calc_cha2ds2vasc,
     _calc_meld,
     _calc_wells_dvt,
@@ -21,6 +14,8 @@ from src.mcp_server.tools.advanced_scores import (
     _calc_gcs,
     _calc_p_possum,
 )
+
+logger = logging.getLogger(__name__)
 
 FHIR_TIMEOUT = 15
 
