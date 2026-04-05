@@ -27,7 +27,6 @@ def _parse_date(date_str: str) -> date:
 
 
 def _match_medication(med_name: str, kb: dict) -> tuple[str, dict] | None:
-    """Match a medication display name against the knowledge base."""
     med_lower = med_name.lower()
     for category, drugs in kb.items():
         for drug_key, drug_info in drugs.items():
@@ -54,7 +53,6 @@ def _extract_med_code(med_resource: dict) -> str:
 
 
 def _match_by_code(rxnorm_code: str, kb: dict) -> tuple[str, dict] | None:
-    """Match by RxNorm code."""
     if not rxnorm_code:
         return None
     for category, drugs in kb.items():
@@ -69,18 +67,21 @@ def _match_by_code(rxnorm_code: str, kb: dict) -> tuple[str, dict] | None:
     description=(
         "Review active medications and flag those requiring perioperative management: "
         "anticoagulant/antiplatelet hold timing, diabetes medication adjustments, "
-        "ACE-I/ARB decisions, herbal supplement cessation, and drug safety alerts."
+        "ACE-I/ARB decisions, herbal supplement cessation, and drug safety alerts. "
+        "Patient ID is optional if FHIR context is available."
     ),
 )
 async def check_periop_medications(
-    patient_id: Annotated[str, "FHIR Patient ID"],
     surgery_date: Annotated[str, "Planned surgery date in YYYY-MM-DD format"],
+    patient_id: Annotated[str | None, "FHIR Patient ID. Optional if patient context exists."] = None,
     surgery_risk_level: Annotated[str, "Surgery bleeding risk: 'low', 'moderate', 'high'"] = "moderate",
-    fhir_base_url: Annotated[str, "FHIR R4 server base URL"] = "https://hapi.fhir.org/baseR4",
-    fhir_token: Annotated[str | None, "FHIR bearer token from SHARP context"] = None,
 ) -> str:
-    """Check medications for perioperative management requirements."""
-    client = FHIRClient(base_url=fhir_base_url, fhir_token=fhir_token)
+    client, header_patient_id = FHIRClient.from_headers()
+    patient_id = patient_id or header_patient_id
+
+    if not patient_id:
+        return "Error: No patient ID provided and no FHIR context available."
+
     medications = await client.get_medications(patient_id)
 
     if not medications:
@@ -93,8 +94,6 @@ async def check_periop_medications(
     for med in medications:
         med_name = _extract_med_name(med)
         med_code = _extract_med_code(med)
-
-        # Try matching by code first, then by name
         match = _match_by_code(med_code, kb) or _match_medication(med_name, kb)
 
         if match:
@@ -102,13 +101,9 @@ async def check_periop_medications(
             hold_days = drug_info.get("hold_days", 0)
             action = drug_info.get("action", "continue")
 
-            # Calculate hold date if applicable
-            timing = drug_info.get("details", "")
             if action == "hold" and hold_days > 0:
                 hold_date = surgery_dt - timedelta(days=hold_days)
                 timing = f"Last dose: {hold_date.isoformat()} (hold {hold_days} days before surgery on {surgery_date}). {drug_info.get('details', '')}"
-            elif action == "adjust":
-                timing = drug_info.get("details", "")
             elif action == "stop":
                 hold_date = surgery_dt - timedelta(days=hold_days)
                 timing = f"Stop by {hold_date.isoformat()} ({hold_days} days before surgery). {drug_info.get('details', '')}"
@@ -116,24 +111,16 @@ async def check_periop_medications(
                 timing = f"Continue perioperatively. {drug_info.get('details', '')}"
 
             actions.append(MedicationAction(
-                medication_name=med_name,
-                action=action,
-                timing=timing.strip(),
-                details=drug_info.get("resume", ""),
-                urgency=drug_info.get("urgency", "routine"),
+                medication_name=med_name, action=action, timing=timing.strip(),
+                details=drug_info.get("resume", ""), urgency=drug_info.get("urgency", "routine"),
             ))
         else:
-            # Unknown medication — flag for manual review
             actions.append(MedicationAction(
-                medication_name=med_name,
-                action="continue",
+                medication_name=med_name, action="continue",
                 timing="No specific perioperative guidance found — continue unless otherwise directed.",
-                details="Review with pharmacist or anesthesiologist if unsure.",
-                urgency="routine",
+                details="Review with pharmacist or anesthesiologist if unsure.", urgency="routine",
             ))
 
-    # Sort by urgency: critical > important > routine
     urgency_order = {"critical": 0, "important": 1, "routine": 2}
     actions.sort(key=lambda a: urgency_order.get(a.urgency, 3))
-
     return json.dumps([a.model_dump() for a in actions], indent=2)

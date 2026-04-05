@@ -9,13 +9,11 @@ from src.mcp_server.fhir_client import FHIRClient
 from src.mcp_server.models import LabReadinessReport, LabResult
 from src.mcp_server.app import mcp
 
-# Required labs by clinical context
 BASE_LABS = [
     ("6690-2", "WBC", "x10^9/L", "4.5-11.0"),
     ("718-7", "Hemoglobin", "g/dL", "12.0-17.5"),
     ("777-3", "Platelets", "x10^9/L", "150-400"),
 ]
-
 METABOLIC_LABS = [
     ("2951-2", "Sodium", "mEq/L", "136-145"),
     ("2823-3", "Potassium", "mEq/L", "3.5-5.0"),
@@ -23,53 +21,23 @@ METABOLIC_LABS = [
     ("3094-0", "BUN", "mg/dL", "7-20"),
     ("2345-7", "Glucose", "mg/dL", "70-100"),
 ]
+COAG_LABS = [("34714-6", "INR", "", "0.9-1.1"), ("3173-2", "aPTT", "seconds", "25-35")]
+DIABETES_LABS = [("4548-4", "HbA1c", "%", "<7.0")]
+CHF_LABS = [("42637-9", "BNP", "pg/mL", "<100")]
+TYPE_SCREEN_LABS = [("882-1", "ABO Group", "", ""), ("10331-7", "Rh Type", "", "")]
 
-COAG_LABS = [
-    ("34714-6", "INR", "", "0.9-1.1"),
-    ("3173-2", "aPTT", "seconds", "25-35"),
-]
-
-DIABETES_LABS = [
-    ("4548-4", "HbA1c", "%", "<7.0"),
-]
-
-CHF_LABS = [
-    ("42637-9", "BNP", "pg/mL", "<100"),
-]
-
-TYPE_SCREEN_LABS = [
-    ("882-1", "ABO Group", "", ""),
-    ("10331-7", "Rh Type", "", ""),
-]
-
-# Reference ranges for abnormal detection
 REFERENCE_RANGES: dict[str, tuple[float | None, float | None]] = {
-    "6690-2": (4.5, 11.0),    # WBC
-    "718-7": (12.0, 17.5),    # Hemoglobin (using wider range; gender-specific in _check_abnormal)
-    "777-3": (150.0, 400.0),  # Platelets
-    "2951-2": (136.0, 145.0), # Sodium
-    "2823-3": (3.5, 5.0),     # Potassium
-    "2160-0": (0.7, 1.3),     # Creatinine
-    "3094-0": (7.0, 20.0),    # BUN
-    "2345-7": (70.0, 100.0),  # Glucose (fasting)
-    "34714-6": (0.9, 1.1),    # INR (non-anticoagulated)
-    "3173-2": (25.0, 35.0),   # aPTT
-    "4548-4": (None, 7.0),    # HbA1c
-    "42637-9": (None, 100.0), # BNP
+    "6690-2": (4.5, 11.0), "718-7": (12.0, 17.5), "777-3": (150.0, 400.0),
+    "2951-2": (136.0, 145.0), "2823-3": (3.5, 5.0), "2160-0": (0.7, 1.3),
+    "3094-0": (7.0, 20.0), "2345-7": (70.0, 100.0), "34714-6": (0.9, 1.1),
+    "3173-2": (25.0, 35.0), "4548-4": (None, 7.0), "42637-9": (None, 100.0),
 }
-
-# Critical values that need immediate attention
 CRITICAL_RANGES: dict[str, tuple[float | None, float | None]] = {
-    "2823-3": (3.0, 6.0),     # Potassium
-    "2951-2": (125.0, 155.0), # Sodium
-    "718-7": (7.0, None),     # Hemoglobin
-    "777-3": (50.0, None),    # Platelets
+    "2823-3": (3.0, 6.0), "2951-2": (125.0, 155.0),
+    "718-7": (7.0, None), "777-3": (50.0, None),
 }
-
-# Keywords for determining which additional labs are needed
 HIGH_RISK_SURGERY_KEYWORDS = [
-    "abdominal", "thoracic", "vascular", "aortic", "cardiac", "spine",
-    "major", "open", "aneurysm",
+    "abdominal", "thoracic", "vascular", "aortic", "cardiac", "spine", "major", "open", "aneurysm",
 ]
 
 
@@ -86,11 +54,8 @@ def _parse_date(date_str: str | None) -> date | None:
 
 
 def _check_abnormal(loinc_code: str, value: float | None) -> str:
-    """Return 'normal', 'abnormal_high', 'abnormal_low', or 'critical'."""
     if value is None:
         return "normal"
-
-    # Check critical first
     crit = CRITICAL_RANGES.get(loinc_code)
     if crit:
         low, high = crit
@@ -98,7 +63,6 @@ def _check_abnormal(loinc_code: str, value: float | None) -> str:
             return "critical"
         if high is not None and value > high:
             return "critical"
-
     ref = REFERENCE_RANGES.get(loinc_code)
     if not ref:
         return "normal"
@@ -130,12 +94,8 @@ def _has_medication_name(medications: list[dict], names: list[str]) -> bool:
     return False
 
 
-def _determine_required_labs(
-    conditions: list[dict], medications: list[dict], surgery_type: str, patient: dict,
-) -> list[tuple[str, str, str, str]]:
-    """Determine which labs are required based on clinical context."""
+def _determine_required_labs(conditions, medications, surgery_type, patient):
     required = list(BASE_LABS)
-
     age = 0
     bd = patient.get("birthDate", "")
     if bd:
@@ -144,56 +104,40 @@ def _determine_required_labs(
             today = date.today()
             age = today.year - bd_date.year - ((today.month, today.day) < (bd_date.month, bd_date.day))
 
-    # Add metabolic panel for age >50 or cardiac conditions
     cardiac_codes = {"84114007", "42343007", "414545008", "22298006", "53741008", "413844008"}
     if age > 50 or _has_condition_code(conditions, cardiac_codes):
         required.extend(METABOLIC_LABS)
-
-    # Coag studies if on anticoagulants
-    anticoag_names = ["warfarin", "apixaban", "rivaroxaban", "dabigatran", "enoxaparin"]
-    if _has_medication_name(medications, anticoag_names):
+    if _has_medication_name(medications, ["warfarin", "apixaban", "rivaroxaban", "dabigatran", "enoxaparin"]):
         required.extend(COAG_LABS)
-
-    # HbA1c for diabetics
-    dm_codes = {"44054006", "46635009", "73211009"}
-    if _has_condition_code(conditions, dm_codes):
+    if _has_condition_code(conditions, {"44054006", "46635009", "73211009"}):
         required.extend(DIABETES_LABS)
-
-    # BNP for CHF patients
-    chf_codes = {"84114007", "42343007"}
-    if _has_condition_code(conditions, chf_codes):
+    if _has_condition_code(conditions, {"84114007", "42343007"}):
         required.extend(CHF_LABS)
-
-    # Type & screen for major surgery
     if any(kw in surgery_type.lower() for kw in HIGH_RISK_SURGERY_KEYWORDS):
         required.extend(TYPE_SCREEN_LABS)
 
-    # Deduplicate by LOINC code
     seen = set()
-    deduped = []
-    for lab in required:
-        if lab[0] not in seen:
-            seen.add(lab[0])
-            deduped.append(lab)
-    return deduped
+    return [lab for lab in required if lab[0] not in seen and not seen.add(lab[0])]
 
 
 @mcp.tool(
     name="assess_lab_readiness",
     description=(
         "Check if pre-operative labs are current (within 30 days), within normal range, "
-        "and identify missing required labs based on patient risk factors and surgery type."
+        "and identify missing required labs based on patient risk factors and surgery type. "
+        "Patient ID is optional if FHIR context is available."
     ),
 )
 async def assess_lab_readiness(
-    patient_id: Annotated[str, "FHIR Patient ID"],
     surgery_type: Annotated[str, "Planned surgery type"],
+    patient_id: Annotated[str | None, "FHIR Patient ID. Optional if patient context exists."] = None,
     surgery_date: Annotated[str, "Planned surgery date YYYY-MM-DD"] = "",
-    fhir_base_url: Annotated[str, "FHIR R4 server base URL"] = "https://hapi.fhir.org/baseR4",
-    fhir_token: Annotated[str | None, "FHIR bearer token from SHARP context"] = None,
 ) -> str:
-    """Assess pre-operative lab readiness."""
-    client = FHIRClient(base_url=fhir_base_url, fhir_token=fhir_token)
+    client, header_patient_id = FHIRClient.from_headers()
+    patient_id = patient_id or header_patient_id
+
+    if not patient_id:
+        return "Error: No patient ID provided and no FHIR context available."
 
     patient = await client.get_patient(patient_id)
     if not patient:
@@ -212,22 +156,16 @@ async def assess_lab_readiness(
     labs_missing: list[str] = []
 
     for loinc_code, test_name, unit, ref_range in required_labs:
-        # Find the most recent observation with this LOINC code
-        matching = []
-        for obs in lab_observations:
-            for coding in obs.get("code", {}).get("coding", []):
-                if coding.get("code") == loinc_code:
-                    matching.append(obs)
-
+        matching = [
+            obs for obs in lab_observations
+            for coding in obs.get("code", {}).get("coding", [])
+            if coding.get("code") == loinc_code
+        ]
         if not matching:
             labs_missing.append(f"{test_name} (LOINC: {loinc_code})")
             continue
 
-        # Get most recent by effectiveDateTime
-        matching.sort(
-            key=lambda o: o.get("effectiveDateTime", ""),
-            reverse=True,
-        )
+        matching.sort(key=lambda o: o.get("effectiveDateTime", ""), reverse=True)
         latest = matching[0]
         vq = latest.get("valueQuantity", {})
         value = vq.get("value")
@@ -240,34 +178,24 @@ async def assess_lab_readiness(
         status = _check_abnormal(loinc_code, value)
 
         lab_result = LabResult(
-            test_name=test_name,
-            loinc_code=loinc_code,
+            test_name=test_name, loinc_code=loinc_code,
             value=float(value) if value is not None else None,
-            unit=obs_unit,
-            reference_range=ref_range,
-            status=status,
+            unit=obs_unit, reference_range=ref_range, status=status,
             collection_date=collection_date[:10] if collection_date else "",
-            is_expired=is_expired,
-            days_old=days_old,
+            is_expired=is_expired, days_old=days_old,
         )
-
         if is_expired:
             labs_expired.append(lab_result)
         else:
             labs_current.append(lab_result)
-
         if status in ("abnormal_high", "abnormal_low", "critical"):
             labs_abnormal.append(lab_result)
 
     overall_ready = len(labs_missing) == 0 and len(labs_expired) == 0 and not any(
         lab.status == "critical" for lab in labs_abnormal
     )
-
     report = LabReadinessReport(
-        labs_current=labs_current,
-        labs_expired=labs_expired,
-        labs_missing=labs_missing,
-        labs_abnormal=labs_abnormal,
-        overall_ready=overall_ready,
+        labs_current=labs_current, labs_expired=labs_expired,
+        labs_missing=labs_missing, labs_abnormal=labs_abnormal, overall_ready=overall_ready,
     )
     return report.model_dump_json(indent=2)

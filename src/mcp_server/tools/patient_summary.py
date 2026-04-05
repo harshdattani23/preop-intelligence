@@ -48,7 +48,6 @@ def _extract_name(patient: dict) -> str:
 
 
 def _extract_coding(resource: dict, field: str = "code") -> tuple[str, str, str]:
-    """Extract (code, display, system) from a CodeableConcept field."""
     concept = resource.get(field, {})
     codings = concept.get("coding", [])
     if codings:
@@ -152,7 +151,6 @@ def _extract_vitals(observations: list[dict]) -> dict[str, VitalSign]:
         vq = obs.get("valueQuantity", {})
         value = vq.get("value")
         if value is None:
-            # Check for component observations (e.g., blood pressure)
             components = obs.get("component", [])
             for comp in components:
                 comp_code, comp_display, _ = _extract_coding(comp)
@@ -178,16 +176,18 @@ def _extract_vitals(observations: list[dict]) -> dict[str, VitalSign]:
     description=(
         "Extract comprehensive patient data from FHIR including demographics, "
         "conditions, medications, labs, allergies, procedures, and vital signs "
-        "for perioperative assessment."
+        "for perioperative assessment. Patient ID is optional if FHIR context is available."
     ),
 )
 async def get_patient_summary(
-    patient_id: Annotated[str, "FHIR Patient ID (e.g., 'patient-a', 'patient-c')"],
-    fhir_base_url: Annotated[str, "FHIR R4 server base URL"] = "https://hapi.fhir.org/baseR4",
-    fhir_token: Annotated[str | None, "FHIR bearer token from SHARP context"] = None,
+    patient_id: Annotated[str | None, "FHIR Patient ID. Optional if patient context exists."] = None,
 ) -> str:
     """Extract and structure patient data for pre-operative assessment."""
-    client = FHIRClient(base_url=fhir_base_url, fhir_token=fhir_token)
+    client, header_patient_id = FHIRClient.from_headers()
+    patient_id = patient_id or header_patient_id
+
+    if not patient_id:
+        return "Error: No patient ID provided and no FHIR context available."
 
     patient = await client.get_patient(patient_id)
     if not patient:
