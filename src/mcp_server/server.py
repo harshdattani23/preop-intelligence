@@ -10,6 +10,7 @@ import src.mcp_server.tools.surgical_risk  # noqa: F401
 import src.mcp_server.tools.periop_medications  # noqa: F401
 import src.mcp_server.tools.lab_readiness  # noqa: F401
 import src.mcp_server.tools.anesthesia  # noqa: F401
+import src.mcp_server.tools.advanced_scores  # noqa: F401
 
 
 def main():

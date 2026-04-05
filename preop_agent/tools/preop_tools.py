@@ -7,7 +7,7 @@ and queries the patient's FHIR server to compute clinical assessments.
 
 import json
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 import httpx
@@ -440,7 +440,6 @@ def get_anesthesia_considerations(tool_context: ToolContext) -> dict:
 
     try:
         conditions = _fhir_search(fhir_url, token, "Condition", {"patient": patient_id, "_count": "50"})
-        meds = _fhir_search(fhir_url, token, "MedicationRequest", {"patient": patient_id, "status": "active", "_count": "50"})
         observations = _fhir_search(fhir_url, token, "Observation", {"patient": patient_id, "_count": "50"})
         allergies = _fhir_search(fhir_url, token, "AllergyIntolerance", {"patient": patient_id, "_count": "20"})
     except Exception as e:

@@ -55,5 +55,11 @@ a2a_app = create_a2a_app(
             description="Assess airway risk, NPO guidance, allergies, and anesthesia-specific recommendations.",
             tags=["anesthesia", "airway", "safety"],
         ),
+        AgentSkill(
+            id="advanced-risk-scores",
+            name="advanced-risk-scores",
+            description="Calculate advanced scores: CHA₂DS₂-VASc (stroke), MELD-Na (liver), Wells (DVT), HEART (chest pain), LEMON (airway), GCS (neuro), P-POSSUM (surgical mortality).",
+            tags=["risk-scores", "cha2ds2vasc", "meld", "wells", "heart", "lemon", "possum"],
+        ),
     ],
 )
