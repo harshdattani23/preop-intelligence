@@ -12,6 +12,7 @@ from .drug_intelligence_a2a import (
     calculate_renal_dose_adjustments_a2a,
     check_allergy_cross_reactivity_a2a,
 )
+from .imaging_assessment_a2a import assess_preop_imaging_a2a
 from .clinical_protocols_a2a import (
     select_antibiotic_prophylaxis_a2a,
     anticipate_blood_products_a2a,
@@ -36,4 +37,5 @@ __all__ = [
     "assess_frailty_a2a",
     "generate_patient_education_a2a",
     "generate_surgical_checklist_a2a",
+    "assess_preop_imaging_a2a",
 ]

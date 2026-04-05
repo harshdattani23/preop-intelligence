@@ -1,0 +1,117 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "RAD",
+                "display": "Radiology"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "36643-5",
+              "display": "Chest X-ray"
+            }
+          ],
+          "text": "Chest X-ray PA and Lateral"
+        },
+        "subject": {
+          "reference": "Patient/1756c465-beb7-43e1-a7e8-775c0a28a892"
+        },
+        "effectiveDateTime": "2026-03-10",
+        "issued": "2026-03-10T14:30:00-05:00",
+        "conclusion": "Cardiomegaly with mildly prominent pulmonary vascularity suggesting mild pulmonary venous congestion. Small bilateral pleural effusions. No focal consolidation or pneumothorax. Aortic calcification noted. Hyperinflation consistent with COPD. Overall impression: Cardiomegaly with mild pulmonary edema and small pleural effusions, likely related to known CHF."
+      },
+      "request": {
+        "method": "POST",
+        "url": "DiagnosticReport"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "CAR",
+                "display": "Cardiology"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11524-6",
+              "display": "12-Lead ECG"
+            }
+          ],
+          "text": "12-Lead Electrocardiogram"
+        },
+        "subject": {
+          "reference": "Patient/1756c465-beb7-43e1-a7e8-775c0a28a892"
+        },
+        "effectiveDateTime": "2026-03-10",
+        "issued": "2026-03-10T14:45:00-05:00",
+        "conclusion": "Atrial fibrillation with controlled ventricular rate at 78 bpm. Left ventricular hypertrophy by voltage criteria. Non-specific ST-T wave changes in leads V4-V6, likely related to LVH and/or ischemia. Old Q waves in leads II, III, aVF consistent with prior inferior myocardial infarction. No acute ST elevation. Prolonged QTc at 468ms."
+      },
+      "request": {
+        "method": "POST",
+        "url": "DiagnosticReport"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "CAR",
+                "display": "Cardiology"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "42148-7",
+              "display": "Transthoracic Echocardiogram"
+            }
+          ],
+          "text": "Transthoracic Echocardiogram"
+        },
+        "subject": {
+          "reference": "Patient/1756c465-beb7-43e1-a7e8-775c0a28a892"
+        },
+        "effectiveDateTime": "2026-02-20",
+        "issued": "2026-02-20T11:00:00-05:00",
+        "conclusion": "Left ventricular ejection fraction estimated at 30% (severely reduced). Global hypokinesis with regional wall motion abnormalities in the inferior and inferolateral segments (consistent with prior MI territory). Left ventricle is mildly dilated. Moderate mitral regurgitation. Mild aortic stenosis (valve area 1.4 cm2, mean gradient 18 mmHg). Tricuspid regurgitation with estimated pulmonary artery systolic pressure of 45 mmHg (mildly elevated). No pericardial effusion. Right ventricle is mildly dilated with mildly reduced systolic function. Diastolic dysfunction grade II (pseudonormal filling pattern)."
+      },
+      "request": {
+        "method": "POST",
+        "url": "DiagnosticReport"
+      }
+    }
+  ]
+}

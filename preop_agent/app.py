@@ -109,5 +109,11 @@ a2a_app = create_a2a_app(
             description="Generate WHO-style surgical safety checklist with patient-specific safety flags.",
             tags=["checklist", "safety", "WHO"],
         ),
+        AgentSkill(
+            id="preop-imaging-assessment",
+            name="preop-imaging-assessment",
+            description="Assess required pre-op imaging (CXR, ECG, echo, CT), check availability, flag missing/expired, parse report findings.",
+            tags=["imaging", "radiology", "ecg", "xray", "echo"],
+        ),
     ],
 )

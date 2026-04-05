@@ -13,6 +13,7 @@ import src.mcp_server.tools.anesthesia  # noqa: F401
 import src.mcp_server.tools.advanced_scores  # noqa: F401
 import src.mcp_server.tools.drug_intelligence  # noqa: F401
 import src.mcp_server.tools.clinical_protocols  # noqa: F401
+import src.mcp_server.tools.imaging_assessment  # noqa: F401
 
 
 def main():
