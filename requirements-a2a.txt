@@ -1,6 +1,9 @@
 # Core ADK framework + A2A server
-google-adk>=1.25.0
-a2a-sdk[http-server]>=0.3.0
+# a2a-sdk 1.0.0 (2026-04-20) is a breaking change — google-adk 1.31.x still
+# imports from the pre-1.0 module layout (a2a.server.apps.A2AStarletteApplication).
+# Pin both to the compatible pre-1.0 line until google-adk migrates.
+google-adk>=1.31.0,<2.0.0
+a2a-sdk[http-server]>=0.3.26,<1.0.0
 
 # HTTP client for FHIR tools
 httpx>=0.28.0
