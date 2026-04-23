@@ -50,7 +50,6 @@ from a2a.types import (
     AgentExtension,
     AgentSkill,
     APIKeySecurityScheme,
-    In,
     SecurityScheme,
 )
 from google.adk.a2a.utils.agent_to_a2a import to_a2a
@@ -104,12 +103,21 @@ def create_a2a_app(
 
     # Security scheme — advertised in the agent card so callers know what to send.
     if require_api_key:
+        # `In` was removed/renamed in newer a2a-sdk. Import defensively and
+        # fall back to the literal "header" string (accepted by the pydantic
+        # schema in both old and new versions).
+        try:
+            from a2a.types import In as _In
+            in_header = _In.header
+        except ImportError:
+            in_header = "header"
+
         security_schemes = {
             "apiKey": SecurityScheme(
                 root=APIKeySecurityScheme(
                     type="apiKey",
                     name="X-API-Key",
-                    in_=In.header,
+                    in_=in_header,
                     description="API key required to access this agent.",
                 )
             )
