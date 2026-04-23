@@ -2,9 +2,22 @@
 
 **Perioperative Risk Assessment & Optimization System**
 
-> The only AI agent on the Prompt Opinion marketplace that performs comprehensive pre-operative surgical assessments — 15 clinical tools, 11 validated scoring systems, and complete perioperative workflow automation.
+> **16 clinical tools · 11 validated scoring systems · 16 A2A skills · dual MCP + A2A transport · multimodal PDF parsing.** The deepest clinical agent on the Prompt Opinion marketplace — by a factor of 2–3×.
 
 Built for the [Agents Assemble](https://agents-assemble.devpost.com/) Healthcare AI Hackathon.
+
+### Density, compared
+
+| Agent | Skills / tools | Validated scores | Multimodal | Dual transport |
+|---|---|---|---|---|
+| **PreOp Intelligence (us)** | **16 tools / 16 skills** | **11** | ✅ PDF op-notes | ✅ MCP + A2A |
+| AetherMed Agentic | 5 skills | 0 | ✅ Images + docs | — |
+| AnakUnggul (ASD) | 7 skills | 1 (escalation risk) | — | — |
+| ALICE + ARIA (prior auth) | 3 skills across 2 agents | 0 | — | — |
+| A2A-MediFlow | 2 skills | 0 | — | — |
+| Abuja Clinic Nurse | 1 skill | 0 | — | — |
+
+Every tool we ship is wired to peer-reviewed literature. Every score is auditable. Every recommendation names the exact drug, the exact dose, and the exact date.
 
 ---
 
@@ -20,9 +33,9 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
 
 **Live on Prompt Opinion Marketplace:** [View Agent →](https://app.promptopinion.ai/marketplace)
 
-**MCP Server Endpoint:** `https://preop-mcp-server-424758858331.us-central1.run.app/mcp`
+**MCP Server Endpoint:** `https://preop-mcp-server-yrv5ygakiq-uc.a.run.app/mcp`
 
-**A2A Agent Card:** `https://preop-agent-424758858331.us-central1.run.app/.well-known/agent-card.json`
+**A2A Agent Card:** `https://preop-agent-yrv5ygakiq-uc.a.run.app/.well-known/agent-card.json`
 
 ---
 
@@ -38,7 +51,7 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
            │                                  │
     ┌──────▼──────┐                   ┌───────▼───────┐
     │  MCP Server  │                   │  A2A Agent     │
-    │  15 Tools    │                   │  14 Skills     │
+    │  16 Tools    │                   │  15 Skills     │
     │  Cloud Run   │                   │  Gemini 3.1    │
     │              │                   │  Cloud Run     │
     └──────┬──────┘                   └───────┬───────┘
@@ -61,7 +74,7 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
 
 ---
 
-## 15 Clinical Tools
+## 16 Clinical Tools
 
 ### Risk Scoring (11 validated systems)
 
@@ -96,6 +109,12 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
 | `anticipate_blood_products` | Crossmatch units, transfusion thresholds, cell saver recommendation |
 | `generate_surgical_checklist` | WHO Surgical Safety Checklist auto-populated with patient-specific safety flags |
 | `generate_patient_education` | Plain-language pre-op instructions (fasting, medications, what to bring) |
+
+### Multimodal
+
+| Tool | What It Does |
+|------|-------------|
+| `parse_prior_operative_note` | Parses a prior surgical PDF — extracts difficult-airway history, drug allergies with severity, intra-op hemodynamics (CPB time, LVEF, peak creatinine), transfusion history, and post-op complications (AFib, AKI, pneumonia, VTE). Each finding is mapped to a concrete pre-op implication with severity. Accepts FHIR `DocumentReference`, base64 PDF, or raw text. |
 
 ### Orchestration
 
@@ -139,7 +158,7 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
 | A2A Agent | Google ADK + a2a-sdk with Gemini 3.1 Pro |
 | FHIR Client | httpx — async, supports any FHIR R4 server |
 | Deployment | Google Cloud Run (auto-scaling, HTTPS) |
-| CI/CD | GitHub Actions — lint (ruff) + 28 tests + auto-deploy |
+| CI/CD | GitHub Actions — lint (ruff) + 39 tests + auto-deploy |
 | Data | 100% synthetic (Synthea-compatible FHIR R4 bundles) |
 | Platform | Prompt Opinion (promptopinion.ai) |
 
@@ -155,7 +174,7 @@ preop-intelligence/
 │   │   ├── server.py         # Entry point, registers all tools
 │   │   ├── fhir_client.py    # FHIR R4 client (headers + local bundles)
 │   │   ├── models.py         # Pydantic data models
-│   │   └── tools/            # 15 MCP tool implementations
+│   │   └── tools/            # 16 MCP tool implementations
 │   ├── scoring/              # Pure clinical logic (shared by MCP + A2A)
 │   │   ├── calculators.py    # 7 advanced scoring systems
 │   │   ├── drug_intelligence.py  # Interactions, renal dosing, allergies
@@ -165,10 +184,10 @@ preop-intelligence/
 │       └── medication_knowledge_base.json  # 35 drugs, 8 categories
 ├── preop_agent/              # A2A Agent (Google ADK)
 │   ├── agent.py              # Agent definition + Gemini 3.1 Pro
-│   ├── app.py                # A2A app with 14 skills
+│   ├── app.py                # A2A app with 16 skills
 │   └── tools/                # A2A tool wrappers
 ├── shared/                   # A2A infrastructure (from po-adk-python)
-├── tests/                    # 28 tests (pytest)
+├── tests/                    # 39 tests (pytest)
 ├── Dockerfile                # MCP Server container
 ├── Dockerfile.a2a            # A2A Agent container
 └── .github/workflows/        # CI (lint + test) + CD (Cloud Run deploy)
@@ -232,12 +251,12 @@ mv Dockerfile Dockerfile.a2a && mv Dockerfile.mcp Dockerfile
 2. Endpoint: `https://preop-mcp-server-xxx.run.app/mcp`
 3. Transport: Streamable HTTP
 4. Requires Patient Data Access: ON
-5. Test → Should show all 15 tools
+5. Test → Should show all 16 tools
 
 ### A2A Agent
 1. Agents → External Agents → Add Connection
 2. Agent Card URL: `https://preop-agent-xxx.run.app/.well-known/agent-card.json`
-3. Should discover 14 skills
+3. Should discover 16 skills
 
 ---
 
@@ -246,17 +265,34 @@ mv Dockerfile Dockerfile.a2a && mv Dockerfile.mcp Dockerfile
 ### The AI Factor
 > Does the solution leverage Generative AI to address a challenge that traditional rule-based software cannot?
 
-**Hybrid architecture:** 11 validated clinical scoring systems (deterministic, evidence-based) + Gemini 3.1 Pro synthesis (contextual clinical reasoning). The scoring is precise and auditable; the AI synthesizes findings across all assessments into a cohesive clinical narrative that a rule-based system cannot produce. The AI also decides which tools to invoke based on the clinical question — adaptive tool selection, not hard-coded workflows.
+**Hybrid by design — deterministic where accuracy is life-or-death, generative where reasoning is required.**
+
+- **11 validated scoring systems** (RCRI, Caprini, STOP-BANG, CHA₂DS₂-VASc, MELD-Na, Wells, HEART, LEMON, GCS, P-POSSUM, ASA) encoded as pure Python. Every number is traceable to peer-reviewed literature. No LLM guessing on scores.
+- **Gemini 3.1 Pro** picks which of the 16 tools to run for a given clinical question, synthesizes the output into a cohesive clearance narrative, and reads unstructured PDFs that pure rule-based systems can't touch.
+- **Multimodal PDF op-note parsing** pulls 4 life-critical findings (difficult-airway history, post-op AFib, peri-op AKI, transfusion history) from scans that currently sit unread in every chart. Rule-based systems can't open a PDF.
+
+Other marketplace agents that *only* use an LLM hallucinate dose adjustments; agents that *only* use rules can't read a prior op note. We do both, correctly.
 
 ### Potential Impact
 > Does this address a significant pain point? Is there a clear hypothesis for improving outcomes, reducing costs, or saving time?
 
-**300+ million surgeries per year globally.** Each requires pre-operative assessment. Current process: 30-45 minutes of manual chart review per patient. PreOp Intelligence reduces this to 30 seconds. Catches medication conflicts (warfarin hold timing), missing labs, drug interactions, and airway risks that are commonly missed in manual reviews — directly preventing surgical complications and saving lives.
+**300 million surgeries a year. Every single one needs this.**
+
+- **Time:** 30-45 min of manual chart review → 30 seconds.
+- **Safety:** Catches warfarin hold-date arithmetic errors, missed eGFR-dependent dose reductions, stale ECGs, difficult-airway histories buried in prior op PDFs, and β-lactam cross-reactivity that kills penicillin-allergic patients when the reflex antibiotic is Cefazolin. See `demo/DEMO_SCRIPT.md` — any single missed item could kill the patient.
+- **Scale:** Unlike niche agents (Abuja-specific intake, ASD caregiver support, specialty prior-auth), pre-op clearance is a universal workflow that every surgical patient in every hospital needs before every procedure.
 
 ### Feasibility
 > Could this exist in a real healthcare system today? Does architecture respect data privacy, safety standards, and regulatory constraints?
 
-**Production-ready architecture:** FHIR R4 native (mandatory for US healthcare systems since 2020). Uses published, peer-reviewed scoring systems (RCRI, Caprini, STOP-BANG, CHA₂DS₂-VASc). 100% synthetic data — no PHI. All outputs are "decision support" with clinician-in-the-loop — never auto-approves clearance. SHARP-on-MCP compliant for credential handling. Deployed on Cloud Run with CI/CD, auto-scaling, and HTTPS.
+**Production-ready, not demoware.**
+
+- **FHIR R4 native** — mandatory for US healthcare since 2020; platform injects patient context via SHARP-on-MCP headers and A2A message metadata.
+- **Peer-reviewed scoring only** — no invented scores; every calculator cites its source.
+- **100% synthetic data** — no PHI in the repo; short-lived tokens in production.
+- **Clinician-in-the-loop** — every response ends with "This is AI-generated decision support requiring clinician review." The agent *never* auto-approves clearance.
+- **Deployed** — both MCP server and A2A agent live on Google Cloud Run with HTTPS, auto-scaling, GitHub Actions CI/CD, 39 unit tests, ruff lint.
+- **Dual transport** — integrates with any MCP-compatible platform *and* any A2A-compatible orchestrator. No other agent in the marketplace ships both paths.
 
 ---
 

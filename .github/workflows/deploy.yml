@@ -39,7 +39,7 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to Cloud Run
+      - name: Deploy MCP server
         run: |
           gcloud run deploy preop-mcp-server \
             --source . \
@@ -48,6 +48,25 @@ jobs:
             --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
             --memory 512Mi \
             --timeout 60 \
+            --min-instances 0 \
+            --max-instances 3 \
+            --project preop-intelligence \
+            --quiet
+
+      - name: Swap Dockerfile for A2A deploy
+        run: |
+          mv Dockerfile Dockerfile.mcp.bak
+          mv Dockerfile.a2a Dockerfile
+
+      - name: Deploy A2A agent
+        run: |
+          gcloud run deploy preop-agent \
+            --source . \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --set-env-vars="GOOGLE_API_KEY=${{ secrets.GEMINI_API_KEY }},GOOGLE_GENAI_USE_VERTEXAI=FALSE,PO_PLATFORM_BASE_URL=https://app.promptopinion.ai,PREOP_AGENT_URL=https://preop-agent-yrv5ygakiq-uc.a.run.app" \
+            --memory 1Gi \
+            --timeout 300 \
             --min-instances 0 \
             --max-instances 3 \
             --project preop-intelligence \

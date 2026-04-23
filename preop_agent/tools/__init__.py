@@ -13,6 +13,7 @@ from .drug_intelligence_a2a import (
     check_allergy_cross_reactivity_a2a,
 )
 from .imaging_assessment_a2a import assess_preop_imaging_a2a
+from .surgical_history_a2a import parse_prior_operative_note_a2a
 from .clinical_protocols_a2a import (
     select_antibiotic_prophylaxis_a2a,
     anticipate_blood_products_a2a,
@@ -38,4 +39,5 @@ __all__ = [
     "generate_patient_education_a2a",
     "generate_surgical_checklist_a2a",
     "assess_preop_imaging_a2a",
+    "parse_prior_operative_note_a2a",
 ]

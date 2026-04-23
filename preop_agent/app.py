@@ -115,5 +115,11 @@ a2a_app = create_a2a_app(
             description="Assess required pre-op imaging (CXR, ECG, echo, CT), check availability, flag missing/expired, parse report findings.",
             tags=["imaging", "radiology", "ecg", "xray", "echo"],
         ),
+        AgentSkill(
+            id="prior-operative-note-parsing",
+            name="prior-operative-note-parsing",
+            description="Parse a prior operative/surgical report (PDF or text). Extracts difficult-airway history, drug allergies with severity, intra-op hemodynamics (CPB time, LVEF, peak creatinine), transfusion history, and post-op complications (AFib, AKI, pneumonia). Each finding is mapped to a concrete pre-op implication.",
+            tags=["multimodal", "pdf", "operative-note", "airway", "allergy", "history"],
+        ),
     ],
 )

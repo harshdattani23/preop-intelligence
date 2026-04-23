@@ -13,3 +13,7 @@ build/
 demo/batch_*
 demo/Burl285_*
 demo/demo_patient_*
+demo/burl_imaging_as_obs.json
+demo/burl_imaging_test.json
+demo/burl_imaging_v2.json
+demo/burl_imaging_v3.json
