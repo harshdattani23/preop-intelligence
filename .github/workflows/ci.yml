@@ -18,10 +18,12 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: |
+          pip install -e ".[dev]"
+          pip install -r requirements-a2a.txt
 
       - name: Lint
-        run: ruff check src/ tests/
+        run: ruff check src/ tests/ preop_agent/ postop_agent/ shared/
 
       - name: Run tests
         run: pytest tests/ -v

@@ -16,7 +16,9 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: pip install -e ".[dev]"
+        run: |
+          pip install -e ".[dev]"
+          pip install -r requirements-a2a.txt
 
       - name: Run tests
         run: pytest tests/ -v
