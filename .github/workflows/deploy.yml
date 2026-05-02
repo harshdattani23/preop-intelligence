@@ -71,3 +71,32 @@ jobs:
             --max-instances 3 \
             --project preop-intelligence \
             --quiet
+
+      - name: Swap Dockerfile for PostOp deploy
+        run: |
+          mv Dockerfile Dockerfile.a2a.bak
+          mv Dockerfile.postop Dockerfile
+
+      - name: Deploy PostOp agent
+        run: |
+          gcloud run deploy postop-agent \
+            --source . \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --set-env-vars="GOOGLE_API_KEY=${{ secrets.GEMINI_API_KEY }},GOOGLE_GENAI_USE_VERTEXAI=FALSE,PO_PLATFORM_BASE_URL=https://app.promptopinion.ai" \
+            --memory 1Gi \
+            --timeout 300 \
+            --min-instances 0 \
+            --max-instances 3 \
+            --project preop-intelligence \
+            --quiet
+
+      - name: Patch POSTOP_AGENT_URL with public URL
+        run: |
+          POSTOP_URL=$(gcloud run services describe postop-agent \
+            --region us-central1 --project preop-intelligence \
+            --format='value(status.url)')
+          gcloud run services update postop-agent \
+            --region us-central1 --project preop-intelligence \
+            --update-env-vars="POSTOP_AGENT_URL=${POSTOP_URL}" \
+            --quiet
