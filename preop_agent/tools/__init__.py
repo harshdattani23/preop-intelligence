@@ -21,6 +21,7 @@ from .clinical_protocols_a2a import (
     generate_patient_education_a2a,
     generate_surgical_checklist_a2a,
 )
+from .verification_a2a import verify_clinical_output_a2a
 
 __all__ = [
     "get_patient_preop_summary",
@@ -40,4 +41,5 @@ __all__ = [
     "generate_surgical_checklist_a2a",
     "assess_preop_imaging_a2a",
     "parse_prior_operative_note_a2a",
+    "verify_clinical_output_a2a",
 ]

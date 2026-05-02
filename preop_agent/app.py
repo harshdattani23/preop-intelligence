@@ -15,10 +15,15 @@ a2a_app = create_a2a_app(
     agent=root_agent,
     name="preop_intelligence",
     description=(
-        "Perioperative risk assessment specialist. Generates comprehensive pre-operative "
+        "Perioperative risk assessment specialist — the first half of a two-agent "
+        "perioperative handoff system. Generates comprehensive pre-operative "
         "clearance reports with ASA classification, RCRI cardiac risk, Caprini VTE score, "
         "STOP-BANG OSA screening, medication management, lab readiness, and anesthesia "
-        "considerations — all from the patient's FHIR record."
+        "considerations — all from the patient's FHIR record. On completion, hands the "
+        "patient off to the PostOp Monitor agent for surgery-day and post-op surveillance. "
+        "Every output is a physician-review draft with an independent verification pass, "
+        "per-section confidence scoring, and source-resource provenance. Aligned with "
+        "ACS NSQIP risk-adjusted reporting and SCIP perioperative quality measures."
     ),
     url=os.getenv("PREOP_AGENT_URL", os.getenv("BASE_URL", "http://localhost:8004")),
     port=8004,
@@ -120,6 +125,18 @@ a2a_app = create_a2a_app(
             name="prior-operative-note-parsing",
             description="Parse a prior operative/surgical report (PDF or text). Extracts difficult-airway history, drug allergies with severity, intra-op hemodynamics (CPB time, LVEF, peak creatinine), transfusion history, and post-op complications (AFib, AKI, pneumonia). Each finding is mapped to a concrete pre-op implication.",
             tags=["multimodal", "pdf", "operative-note", "airway", "allergy", "history"],
+        ),
+        AgentSkill(
+            id="clinical-output-verification",
+            name="clinical-output-verification",
+            description="Independent verification + confidence pass on the generated assessment. Re-fetches FHIR resources, returns per-section confidence (high/medium/low) tied to data completeness, lists unverified areas, and provides source FHIR resource IDs as provenance for every claim category. Aligned with ACS NSQIP risk-adjusted reporting and SCIP perioperative quality measures. All outputs are physician-review drafts.",
+            tags=["verification", "safety", "confidence-scoring", "provenance", "physician-review", "ACS-NSQIP", "SCIP"],
+        ),
+        AgentSkill(
+            id="perioperative-handoff-to-postop",
+            name="perioperative-handoff-to-postop",
+            description="Hand the patient off to the PostOp Monitor agent for surgery-day and post-op surveillance. Carries forward the surgery type, surgery date, ASA class, RCRI score, anticipated airway difficulty, anticoagulation hold plan, and intra-op risk flags so post-op monitoring is anchored to the same FHIR context and risk profile. Pre-op → post-op is the highest-risk clinical handoff in surgical care; this agent pair is engineered to make it auditable.",
+            tags=["handoff", "perioperative", "preop-to-postop", "transitions-of-care", "multi-agent", "continuity"],
         ),
     ],
 )

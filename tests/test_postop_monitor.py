@@ -90,5 +90,7 @@ def test_postop_agent_imports():
     from postop_agent.app import a2a_app
 
     assert root_agent.name == "postop_monitor_agent"
-    assert len(root_agent.tools) == 8
+    assert len(root_agent.tools) == 9
     assert a2a_app is not None
+    tool_names = {t.__name__ for t in root_agent.tools}
+    assert "verify_clinical_output_a2a" in tool_names

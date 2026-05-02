@@ -11,6 +11,7 @@ from preop_agent.tools.drug_intelligence_a2a import (
     check_allergy_cross_reactivity_a2a,
 )
 from preop_agent.tools.surgical_history_a2a import parse_prior_operative_note_a2a
+from preop_agent.tools.verification_a2a import verify_clinical_output_a2a
 
 from .postop_tools import (
     assess_postop_complications,
@@ -26,4 +27,5 @@ __all__ = [
     "parse_prior_operative_note_a2a",
     "assess_postop_complications",
     "recommend_postop_monitoring",
+    "verify_clinical_output_a2a",
 ]
