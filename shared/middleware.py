@@ -27,7 +27,7 @@ from starlette.requests import Request  # kept for type hints in dispatch signat
 from starlette.responses import JSONResponse
 
 from shared.fhir_hook import extract_fhir_from_payload
-from shared.logging_utils import redact_headers, safe_pretty_json, token_fingerprint
+from shared.logging_utils import redact_headers, safe_pretty_json
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +56,18 @@ class FhirMetadataBridgeASGIApp:
 
     def __init__(self, app):
         self.app = app
+        # Print to stdout so it lands in Cloud Run's container log even when
+        # the Python root logger isn't configured to INFO. This is diagnostic:
+        # if we see "FhirMetadataBridgeASGIApp_INIT" in logs, the wrapper is
+        # in the request path; if we don't, app_factory isn't returning it.
+        print("[FhirMetadataBridgeASGIApp_INIT] middleware constructed, wrapping inner app", flush=True)
 
     async def __call__(self, scope, receive, send):
         if scope.get("type") != "http":
             await self.app(scope, receive, send)
             return
+        # Diagnostic: confirm every request flows through us.
+        print(f"[FhirMetadataBridgeASGIApp_CALL] path={scope.get('path')} method={scope.get('method')}", flush=True)
 
         # Drain the request body once so we can inspect (and possibly rewrite) it.
         chunks: list[bytes] = []
@@ -104,16 +111,12 @@ class FhirMetadataBridgeASGIApp:
                     if fhir_key and fhir_data and not params.get("metadata"):
                         params["metadata"] = {fhir_key: fhir_data}
                         new_body = json.dumps(parsed, ensure_ascii=False).encode("utf-8")
-                        logger.info(
-                            "FHIR_METADATA_BRIDGED source=message.metadata target=params.metadata key=%s",
-                            fhir_key,
-                        )
+                        print(f"[FHIR_METADATA_BRIDGED] key={fhir_key}", flush=True)
                     if fhir_data:
-                        logger.info("FHIR_URL_FOUND value=%s",         fhir_data.get("fhirUrl", "[EMPTY]"))
-                        logger.info("FHIR_TOKEN_FOUND fingerprint=%s", token_fingerprint(fhir_data.get("fhirToken", "")))
-                        logger.info("FHIR_PATIENT_FOUND value=%s",     fhir_data.get("patientId", "[EMPTY]"))
+                        print(f"[FHIR_URL_FOUND] {fhir_data.get('fhirUrl', '[EMPTY]')}", flush=True)
+                        print(f"[FHIR_PATIENT_FOUND] {fhir_data.get('patientId', '[EMPTY]')}", flush=True)
                     else:
-                        logger.info("FHIR_NOT_FOUND_IN_PAYLOAD keys_checked=params.metadata,message.metadata")
+                        print("[FHIR_NOT_FOUND_IN_PAYLOAD] keys checked: params.metadata, message.metadata", flush=True)
 
         # Update Content-Length if we rewrote the body.
         if new_body is not body_bytes:
