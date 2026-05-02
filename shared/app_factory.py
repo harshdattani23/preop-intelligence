@@ -54,7 +54,7 @@ from a2a.types import (
 )
 from google.adk.a2a.utils.agent_to_a2a import to_a2a
 
-from shared.middleware import ApiKeyMiddleware
+from shared.middleware import ApiKeyMiddleware, FhirMetadataBridgeMiddleware
 
 
 def create_a2a_app(
@@ -150,7 +150,12 @@ def create_a2a_app(
 
     app = to_a2a(agent, port=port, agent_card=agent_card)
 
-    # Only attach the key-enforcement middleware for authenticated agents.
+    # Always bridge FHIR metadata regardless of auth setting — this is what
+    # makes A2A callers (Prompt Opinion or any generic JSON-RPC client) able
+    # to send FHIR context that reaches the ADK before_model_callback.
+    app.add_middleware(FhirMetadataBridgeMiddleware)
+
+    # Only enforce API key on authenticated agents.
     if require_api_key:
         app.add_middleware(ApiKeyMiddleware)
 

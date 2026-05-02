@@ -1,11 +1,21 @@
 """
-Security middleware — API key authentication.
+Middleware — FHIR metadata bridging + (optional) API key authentication.
 
-Every request is blocked unless it carries a valid X-API-Key header.
-The only public endpoint is /.well-known/agent-card.json, which callers
-need to discover the agent before they can authenticate.
+Two responsibilities, split into two middleware classes so they can be attached
+independently:
 
-In production, load keys from environment variables or a secrets manager
+  - FhirMetadataBridgeMiddleware: always attached. Logs the incoming request
+    (headers redacted) and bridges FHIR metadata from params.message.metadata
+    up to params.metadata so the ADK before_model_callback can find it
+    regardless of where the caller placed it. This is required for every
+    A2A caller — Prompt Opinion, raw JSON-RPC clients, and any other A2A
+    consumer.
+
+  - ApiKeyMiddleware: only attached when require_api_key=True. Enforces
+    X-API-Key header on all non-agent-card requests. The agent-card endpoint
+    is intentionally public so callers can discover that auth is required.
+
+In production, load API keys from environment variables or a secrets manager
 (e.g. Azure Key Vault, AWS Secrets Manager) rather than hardcoding them here.
 """
 import json
@@ -30,17 +40,15 @@ VALID_API_KEYS: set = {
 }
 
 
-class ApiKeyMiddleware(BaseHTTPMiddleware):
+class FhirMetadataBridgeMiddleware(BaseHTTPMiddleware):
     """
-    Starlette middleware that enforces X-API-Key authentication.
-
-    It also logs every incoming request (with headers redacted) and, as a
-    convenience, bridges FHIR metadata from params.message.metadata up to
-    params.metadata so the ADK callback path can find it.
+    Bridge FHIR metadata from params.message.metadata to params.metadata so the
+    ADK before_model_callback can find it regardless of where the caller placed
+    it. Also logs every incoming request payload (headers redacted) for debug.
+    Always attached, regardless of whether API key auth is required.
     """
 
     async def dispatch(self, request: Request, call_next):
-        # Read and parse the body so we can log it and inspect metadata.
         body_bytes = await request.body()
         body_text  = body_bytes.decode("utf-8", errors="replace")
         parsed     = {}
@@ -58,9 +66,6 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
                 pretty_body,
             )
 
-        # Bridge FHIR metadata from message.metadata → params.metadata so that
-        # the ADK before_model_callback (fhir_hook.extract_fhir_context) can
-        # find it regardless of where the caller placed it.
         fhir_key, fhir_data = extract_fhir_from_payload(parsed)
         if isinstance(parsed, dict):
             params = parsed.get("params")
@@ -68,11 +73,11 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
                 if fhir_key and fhir_data and not params.get("metadata"):
                     params["metadata"] = {fhir_key: fhir_data}
                     body_bytes = json.dumps(parsed, ensure_ascii=False).encode("utf-8")
-                    # Mutate Starlette's cached body directly.
-                    # BaseHTTPMiddleware captures `wrapped_receive` from the original
-                    # _CachedRequest object; call_next() reads from that, not from any
-                    # cloned Request we might create.  Setting request._body is the only
-                    # way to make the modified bytes visible to the downstream handler.
+                    # Mutate Starlette's cached body directly. BaseHTTPMiddleware captures
+                    # `wrapped_receive` from the original _CachedRequest object; call_next()
+                    # reads from that, not from any cloned Request we might create. Setting
+                    # request._body is the only way to make the modified bytes visible to
+                    # the downstream handler.
                     request._body = body_bytes  # type: ignore[attr-defined]
                     logger.info(
                         "FHIR_METADATA_BRIDGED source=message.metadata target=params.metadata key=%s",
@@ -85,6 +90,16 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
                 else:
                     logger.info("FHIR_NOT_FOUND_IN_PAYLOAD keys_checked=params.metadata,message.metadata")
 
+        return await call_next(request)
+
+
+class ApiKeyMiddleware(BaseHTTPMiddleware):
+    """
+    Enforce X-API-Key authentication on all non-agent-card requests.
+    Only attached when require_api_key=True in app_factory.
+    """
+
+    async def dispatch(self, request: Request, call_next):
         # Agent-card endpoint is intentionally public — it tells callers that
         # an API key IS required before they start authenticating.
         if request.url.path == "/.well-known/agent-card.json":
