@@ -54,7 +54,7 @@ from a2a.types import (
 )
 from google.adk.a2a.utils.agent_to_a2a import to_a2a
 
-from shared.middleware import ApiKeyMiddleware, FhirMetadataBridgeMiddleware
+from shared.middleware import ApiKeyMiddleware, FhirMetadataBridgeASGIApp
 
 
 def create_a2a_app(
@@ -150,13 +150,15 @@ def create_a2a_app(
 
     app = to_a2a(agent, port=port, agent_card=agent_card)
 
-    # Always bridge FHIR metadata regardless of auth setting — this is what
-    # makes A2A callers (Prompt Opinion or any generic JSON-RPC client) able
-    # to send FHIR context that reaches the ADK before_model_callback.
-    app.add_middleware(FhirMetadataBridgeMiddleware)
-
-    # Only enforce API key on authenticated agents.
+    # Only enforce API key on authenticated agents. add_middleware works here
+    # because google.adk.a2a's to_a2a builds its middleware stack lazily and
+    # ApiKeyMiddleware just rejects bad requests — the A2A handler still runs
+    # for valid ones.
     if require_api_key:
         app.add_middleware(ApiKeyMiddleware)
 
-    return app
+    # Always wrap at the ASGI layer to bridge FHIR metadata. We use a pure ASGI
+    # wrapper rather than app.add_middleware(...) because to_a2a builds its
+    # middleware stack at construction time, which makes Starlette-style
+    # add_middleware calls a silent no-op for body-modifying middleware.
+    return FhirMetadataBridgeASGIApp(app)

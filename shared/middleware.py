@@ -40,57 +40,103 @@ VALID_API_KEYS: set = {
 }
 
 
-class FhirMetadataBridgeMiddleware(BaseHTTPMiddleware):
+class FhirMetadataBridgeASGIApp:
     """
-    Bridge FHIR metadata from params.message.metadata to params.metadata so the
-    ADK before_model_callback can find it regardless of where the caller placed
-    it. Also logs every incoming request payload (headers redacted) for debug.
-    Always attached, regardless of whether API key auth is required.
+    Pure ASGI middleware that bridges FHIR metadata before the request reaches
+    the ADK A2A handler. We use raw ASGI rather than Starlette's BaseHTTPMiddleware
+    because google.adk.a2a.utils.agent_to_a2a builds its middleware stack at app
+    construction time — calling app.add_middleware() afterwards is a silent no-op.
+    Wrapping at the ASGI layer guarantees we run before any Starlette plumbing.
+
+    Two responsibilities:
+      1. Bridge FHIR metadata from params.message.metadata to params.metadata,
+         where the ADK request_converter will surface it on the LLM request.
+      2. Log the incoming payload (headers redacted) for debugging.
     """
 
-    async def dispatch(self, request: Request, call_next):
-        body_bytes = await request.body()
-        body_text  = body_bytes.decode("utf-8", errors="replace")
-        parsed     = {}
-        try:
-            parsed      = json.loads(body_text) if body_text else {}
-            pretty_body = safe_pretty_json(parsed)
-        except json.JSONDecodeError:
-            pretty_body = body_text
+    def __init__(self, app):
+        self.app = app
 
-        if LOG_FULL_PAYLOAD:
-            logger.info(
-                "incoming_http_request path=%s method=%s headers=%s\npayload=\n%s",
-                request.url.path, request.method,
-                safe_pretty_json(redact_headers(dict(request.headers))),
-                pretty_body,
-            )
+    async def __call__(self, scope, receive, send):
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
 
-        fhir_key, fhir_data = extract_fhir_from_payload(parsed)
-        if isinstance(parsed, dict):
-            params = parsed.get("params")
-            if isinstance(params, dict):
-                if fhir_key and fhir_data and not params.get("metadata"):
-                    params["metadata"] = {fhir_key: fhir_data}
-                    body_bytes = json.dumps(parsed, ensure_ascii=False).encode("utf-8")
-                    # Mutate Starlette's cached body directly. BaseHTTPMiddleware captures
-                    # `wrapped_receive` from the original _CachedRequest object; call_next()
-                    # reads from that, not from any cloned Request we might create. Setting
-                    # request._body is the only way to make the modified bytes visible to
-                    # the downstream handler.
-                    request._body = body_bytes  # type: ignore[attr-defined]
-                    logger.info(
-                        "FHIR_METADATA_BRIDGED source=message.metadata target=params.metadata key=%s",
-                        fhir_key,
-                    )
-                if fhir_data:
-                    logger.info("FHIR_URL_FOUND value=%s",         fhir_data.get("fhirUrl", "[EMPTY]"))
-                    logger.info("FHIR_TOKEN_FOUND fingerprint=%s", token_fingerprint(fhir_data.get("fhirToken", "")))
-                    logger.info("FHIR_PATIENT_FOUND value=%s",     fhir_data.get("patientId", "[EMPTY]"))
-                else:
-                    logger.info("FHIR_NOT_FOUND_IN_PAYLOAD keys_checked=params.metadata,message.metadata")
+        # Drain the request body once so we can inspect (and possibly rewrite) it.
+        chunks: list[bytes] = []
+        more_body = True
+        while more_body:
+            message = await receive()
+            if message["type"] == "http.request":
+                chunks.append(message.get("body", b""))
+                more_body = message.get("more_body", False)
+            else:
+                more_body = False
+        body_bytes = b"".join(chunks)
 
-        return await call_next(request)
+        new_body = body_bytes
+        if body_bytes:
+            try:
+                parsed = json.loads(body_bytes.decode("utf-8", errors="replace"))
+            except json.JSONDecodeError:
+                parsed = None
+
+            path = scope.get("path", "")
+            method = scope.get("method", "")
+
+            if LOG_FULL_PAYLOAD and parsed is not None:
+                # Headers come as a list of (bytes, bytes) tuples in scope.
+                hdrs = {
+                    k.decode("latin-1"): v.decode("latin-1")
+                    for k, v in scope.get("headers", [])
+                }
+                logger.info(
+                    "incoming_http_request path=%s method=%s headers=%s\npayload=\n%s",
+                    path, method,
+                    safe_pretty_json(redact_headers(hdrs)),
+                    safe_pretty_json(parsed),
+                )
+
+            if isinstance(parsed, dict):
+                fhir_key, fhir_data = extract_fhir_from_payload(parsed)
+                params = parsed.get("params")
+                if isinstance(params, dict):
+                    if fhir_key and fhir_data and not params.get("metadata"):
+                        params["metadata"] = {fhir_key: fhir_data}
+                        new_body = json.dumps(parsed, ensure_ascii=False).encode("utf-8")
+                        logger.info(
+                            "FHIR_METADATA_BRIDGED source=message.metadata target=params.metadata key=%s",
+                            fhir_key,
+                        )
+                    if fhir_data:
+                        logger.info("FHIR_URL_FOUND value=%s",         fhir_data.get("fhirUrl", "[EMPTY]"))
+                        logger.info("FHIR_TOKEN_FOUND fingerprint=%s", token_fingerprint(fhir_data.get("fhirToken", "")))
+                        logger.info("FHIR_PATIENT_FOUND value=%s",     fhir_data.get("patientId", "[EMPTY]"))
+                    else:
+                        logger.info("FHIR_NOT_FOUND_IN_PAYLOAD keys_checked=params.metadata,message.metadata")
+
+        # Update Content-Length if we rewrote the body.
+        if new_body is not body_bytes:
+            new_headers = []
+            for k, v in scope.get("headers", []):
+                if k.lower() == b"content-length":
+                    continue
+                new_headers.append((k, v))
+            new_headers.append((b"content-length", str(len(new_body)).encode("latin-1")))
+            scope = dict(scope)
+            scope["headers"] = new_headers
+
+        # Replay the (possibly rewritten) body downstream.
+        sent = False
+
+        async def replay_receive():
+            nonlocal sent
+            if sent:
+                return {"type": "http.disconnect"}
+            sent = True
+            return {"type": "http.request", "body": new_body, "more_body": False}
+
+        await self.app(scope, replay_receive, send)
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
