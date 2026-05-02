@@ -8,6 +8,7 @@ from typing import Annotated
 from src.mcp_server.fhir_client import FHIRClient
 from src.mcp_server.models import RiskScoreResult, SurgicalRiskAssessment
 from src.mcp_server.app import mcp
+from src.scoring.citations import cite
 
 # --- SNOMED code sets for condition matching ---
 
@@ -160,6 +161,7 @@ def _calculate_rcri(conditions, medications, observations, surgery_type):
         score_value=score, risk_level=risk_level,
         risk_percentage=f"Estimated major cardiac event risk: {risk_pct}",
         contributing_factors=factors, recommendations=recommendations,
+        citation=cite("RCRI"),
     )
 
 
@@ -213,6 +215,7 @@ def _calculate_caprini(patient, conditions, medications, observations, surgery_t
     return RiskScoreResult(
         score_name="Caprini VTE Risk Score", score_value=score,
         risk_level=risk_level, contributing_factors=factors, recommendations=recs,
+        citation=cite("Caprini"),
     )
 
 
@@ -256,6 +259,7 @@ def _calculate_stop_bang(patient, conditions, observations):
     return RiskScoreResult(
         score_name="STOP-BANG OSA Screening", score_value=score,
         risk_level=risk_level, contributing_factors=factors, recommendations=recs,
+        citation=cite("STOP-BANG"),
     )
 
 
@@ -292,6 +296,7 @@ async def calculate_surgical_risk(
 
     assessment = SurgicalRiskAssessment(
         asa_class=asa_class, asa_description=asa_desc,
+        asa_citation=cite("ASA"),
         rcri=rcri, caprini_vte=caprini, stop_bang=stop_bang,
     )
     return assessment.model_dump_json(indent=2)

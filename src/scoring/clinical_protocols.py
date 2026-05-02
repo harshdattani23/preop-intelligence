@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+from src.scoring.citations import cite
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SHARED HELPERS
@@ -155,6 +157,7 @@ def select_antibiotic_prophylaxis(surgery_type, allergies, patient, observations
             "Ensure skin prep with chlorhexidine-alcohol unless contraindicated.",
             "Verify antibiotic administration documented in surgical safety checklist.",
         ],
+        "citation": cite("antibiotic-prophylaxis"),
     }
 
 
@@ -329,6 +332,7 @@ def assess_frailty(patient, conditions, medications, observations):
         },
         "recommendation": recommendation,
         "periop_note": f"FRAIL score {frail_score}/5 ({frailty_level}). {'Standard care.' if frailty_level == 'robust' else 'Consider geriatrics/prehabilitation referral.'}",
+        "citation": cite("FRAIL"),
     }
 
 

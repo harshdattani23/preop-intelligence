@@ -1,8 +1,12 @@
-# Demo Script — Burl Reinger, AAA Repair
+# Demo Script — Burl Reinger, AAA Repair (Pre-op + Post-op)
 
 A scripted walkthrough for the Prompt Opinion marketplace demo video and live
 judging walkthrough. Every beat is chosen so that at least one agent output
 would have killed the patient if missed. Total runtime target: **3 minutes**.
+
+**The narrative arc:** PreOp Intelligence clears the patient → handoff in the
+same chat to PostOp Monitor on day 2 → composition story showcases what the
+A2A marketplace was built for. **Two agents, one conversation, zero context loss.**
 
 ---
 
@@ -82,11 +86,14 @@ density.
 
 **Narration:**
 > "Eleven validated scoring systems — ASA, RCRI, Caprini, STOP-BANG,
-> CHA₂DS₂-VASc — computed from peer-reviewed literature. No LLM guessing.
-> These are the same scores an anesthesiologist runs by hand."
+> CHA₂DS₂-VASc — computed from peer-reviewed literature. Every score in
+> the trace ships with its primary citation: RCRI is Lee 1999 in
+> Circulation; STOP-BANG is Chung 2008 in Anesthesiology. No LLM guessing.
+> Same scores an anesthesiologist runs by hand."
 
 **Pause on:** RCRI 5/6 — "That single number means cardiology consult is
-mandatory."
+mandatory." Then expand the trace panel to show the `citation` field on the
+RCRI output. Judges should see *Lee TH, Circulation 1999;100:1043-9*.
 
 ---
 
@@ -209,12 +216,51 @@ allergy context.
 
 ---
 
-### Beat 9 — Close (2:50 – 3:00)
+### Beat 9 — The post-op handoff (2:30 – 2:55) 🔥
+
+**User types in the *same chat*:**
+> Burl is now POD 2. What should we monitor for?
+
+**Trace:** Prompt Opinion routes the message to **PostOp Monitor** — the
+companion A2A agent — *while the FHIR context, the surgery type, and the
+prior operative note are all preserved across the handoff.*
+
+**PostOp Monitor calls** (visible in trace):
+1. `get_patient_preop_summary` (now POD 2 snapshot)
+2. `assess_postop_complications` (AKI, AFib, delirium, pulmonary, SSI)
+3. `recommend_postop_monitoring` (vitals q__, labs q__, telemetry, red flags)
+4. `calculate_renal_dose_adjustments` (re-doses every active med for current eGFR)
+
+**Agent returns:**
+
+| Complication | Risk | Trigger | Action |
+|---|---|---|---|
+| **AKI** | elevated | Cr 2.1 (vs 1.9 baseline) | KDIGO Stage 1 — hold NSAIDs/ACEi, q12h Cr trend |
+| **New-onset AFib** | elevated | age 65, CHF, vascular surgery | Continuous tele POD 0-3, correct K/Mg |
+| **Pulmonary** | elevated | upper-abdominal incision | IS q1h, ambulate POD 1, LMWH prophylaxis |
+| **Delirium** | moderate | age 65, opioid exposure | CAM-ICU q-shift, multimodal analgesia |
+
+**Plus a red-flag list** that pages the attending: MAP < 65, UOP < 0.5
+mL/kg/hr, lactate > 2.0, loss of distal pulse.
 
 **Narration:**
-> "Fifteen clinical tools. Eleven validated scoring systems. PDF parsing for
-> prior operative notes. Dual MCP and A2A deployment. Three hundred million
-> surgeries a year, every one needs this. That's PreOp Intelligence."
+> "Same conversation. Same FHIR context. Different specialist. The marketplace
+> just composed two agents — pre-op clearance and post-op monitoring — without
+> losing the airway history, the allergy, or the renal trajectory. That's
+> what A2A composition was built for."
+
+**Pause on:** the AKI finding — it cites *KDIGO 2012 AKI Guideline*. Then on
+the renal-redose tool: *every* active medication has been re-dosed against
+the new Cr.
+
+---
+
+### Beat 10 — Close (2:55 – 3:00)
+
+**Narration:**
+> "Twenty-two skills across two agents. Eleven validated scores, every one
+> cited. Dual MCP and A2A deployment. Pre-op to post-op in a single chat.
+> Three hundred million surgeries a year — every one needs this."
 
 ---
 

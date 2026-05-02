@@ -18,6 +18,7 @@ from preop_agent.tools.preop_tools import (
     IHD_CODES,
     CKD_CODES,
 )
+from src.scoring.citations import cite
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,7 @@ def assess_postop_complications(
             "trigger": f"Cr {creatinine} mg/dL",
             "action": "Trend BUN/Cr q12h; hold nephrotoxins (NSAIDs, ACEi); review contrast exposure; renally dose all meds.",
             "stage_kdigo": "1+" if creatinine < 2.0 else "2+",
+            "citation": cite("postop-AKI-KDIGO"),
         })
     elif _has_condition(conditions, CKD_CODES) or (egfr and egfr < 60):
         findings.append({
@@ -86,6 +88,7 @@ def assess_postop_complications(
             "risk": "moderate",
             "trigger": f"baseline CKD; eGFR {egfr}" if egfr else "CKD diagnosis",
             "action": "Daily Cr; strict I/O; avoid nephrotoxins.",
+            "citation": cite("postop-AKI-KDIGO"),
         })
 
     afib_substrate = age >= 65 or _has_condition(conditions, CHF_CODES) or _has_condition(conditions, IHD_CODES)
@@ -97,6 +100,7 @@ def assess_postop_complications(
             "trigger": f"age {age}, cardiac/thoracic substrate, high-risk surgery",
             "action": "Continuous telemetry POD 0-3; correct K/Mg; hold rate-control if hypotensive; CHA₂DS₂-VASc on first AF episode for anticoagulation decision.",
             "incidence_pct": 30 if surgery_class["thoracic"] else 12,
+            "citation": cite("postop-AFib"),
         })
 
     sedating_meds = [
@@ -110,6 +114,7 @@ def assess_postop_complications(
             "risk": "elevated" if on_opioids else "moderate",
             "trigger": f"age {age}" + (", on opioids" if on_opioids else ""),
             "action": "CAM-ICU q-shift; reorient frequently; sleep-wake cycle protection; minimize benzodiazepines; multimodal non-opioid analgesia.",
+            "citation": cite("postop-delirium"),
         })
 
     if surgery_class["thoracic"] or surgery_class["abdominal"]:
@@ -118,6 +123,7 @@ def assess_postop_complications(
             "risk": "elevated",
             "trigger": f"{'thoracic' if surgery_class['thoracic'] else 'upper-abdominal'} incision",
             "action": "Incentive spirometry q1h while awake; early ambulation POD 1; chemical VTE prophylaxis (LMWH); SCDs continuous; daily SpO2 trend.",
+            "citation": cite("postop-VTE-prophylaxis"),
         })
 
     if surgery_class["vascular"]:

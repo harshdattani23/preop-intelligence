@@ -64,11 +64,13 @@ class RiskScoreResult(BaseModel):
     risk_percentage: str | None = None
     contributing_factors: list[str] = []
     recommendations: list[str] = []
+    citation: str = ""
 
 
 class SurgicalRiskAssessment(BaseModel):
     asa_class: str
     asa_description: str
+    asa_citation: str = ""
     rcri: RiskScoreResult
     caprini_vte: RiskScoreResult
     stop_bang: RiskScoreResult

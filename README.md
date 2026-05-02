@@ -1,23 +1,23 @@
-# PreOp Intelligence
+# PreOp Intelligence + PostOp Monitor
 
-**Perioperative Risk Assessment & Optimization System**
+**Two-agent perioperative system: pre-op clearance hands off to post-op monitoring in a single Prompt Opinion conversation.**
 
-> **16 clinical tools · 11 validated scoring systems · 16 A2A skills · dual MCP + A2A transport · multimodal PDF parsing.** The deepest clinical agent on the Prompt Opinion marketplace — by a factor of 2–3×.
+> **22 skills across 2 agents · 11 validated scoring systems · every score cited from primary literature · multimodal PDF parsing of prior op notes · dual MCP + A2A transport.** The deepest clinical agent on the Prompt Opinion marketplace — by a factor of 2–3× — and the only one demonstrating multi-agent composition.
 
 Built for the [Agents Assemble](https://agents-assemble.devpost.com/) Healthcare AI Hackathon.
 
 ### Density, compared
 
-| Agent | Skills / tools | Validated scores | Multimodal | Dual transport |
-|---|---|---|---|---|
-| **PreOp Intelligence (us)** | **16 tools / 16 skills** | **11** | ✅ PDF op-notes | ✅ MCP + A2A |
-| AetherMed Agentic | 5 skills | 0 | ✅ Images + docs | — |
-| AnakUnggul (ASD) | 7 skills | 1 (escalation risk) | — | — |
-| ALICE + ARIA (prior auth) | 3 skills across 2 agents | 0 | — | — |
-| A2A-MediFlow | 2 skills | 0 | — | — |
-| Abuja Clinic Nurse | 1 skill | 0 | — | — |
+| Agent | Skills / tools | Validated scores | Multimodal | Multi-agent | Dual transport |
+|---|---|---|---|---|---|
+| **PreOp + PostOp (us)** | **22 skills across 2 agents** | **11 (all cited)** | ✅ PDF op-notes | ✅ preop→postop handoff | ✅ MCP + A2A |
+| AetherMed Agentic | 5 skills | 0 | ✅ Images + docs | — | — |
+| AnakUnggul (ASD) | 7 skills | 1 (escalation risk) | — | — | — |
+| ALICE + ARIA (prior auth) | 3 skills across 2 agents | 0 | — | partial | — |
+| A2A-MediFlow | 2 skills | 0 | — | — | — |
+| Abuja Clinic Nurse | 1 skill | 0 | — | — | — |
 
-Every tool we ship is wired to peer-reviewed literature. Every score is auditable. Every recommendation names the exact drug, the exact dose, and the exact date.
+Every tool we ship is wired to peer-reviewed literature, and the citation is **inlined into the trace panel JSON** so an anesthesiologist auditing the agent sees `Lee TH, Circulation 1999;100:1043-9` next to the RCRI score. Every recommendation names the exact drug, the exact dose, and the exact date.
 
 ---
 
@@ -31,11 +31,15 @@ PreOp Intelligence automates the entire pre-operative clearance process — a wo
 
 ## Demo
 
-**Live on Prompt Opinion Marketplace:** [View Agent →](https://app.promptopinion.ai/marketplace)
+**Live on Prompt Opinion Marketplace:** [View Agents →](https://app.promptopinion.ai/marketplace)
 
-**MCP Server Endpoint:** `https://preop-mcp-server-yrv5ygakiq-uc.a.run.app/mcp`
+| Service | URL |
+|---|---|
+| MCP server | `https://preop-mcp-server-yrv5ygakiq-uc.a.run.app/mcp` |
+| **PreOp Intelligence** A2A agent card | `https://preop-agent-yrv5ygakiq-uc.a.run.app/.well-known/agent-card.json` |
+| **PostOp Monitor** A2A agent card | `https://postop-agent-yrv5ygakiq-uc.a.run.app/.well-known/agent-card.json` |
 
-**A2A Agent Card:** `https://preop-agent-yrv5ygakiq-uc.a.run.app/.well-known/agent-card.json`
+The companion PostOp Monitor agent screens for the four complications driving most post-op morbidity (AKI, new-onset AFib, delirium, pulmonary), generates surgery- and ASA-driven monitoring plans with explicit red-flag thresholds, and re-doses every active medication for the patient's current renal trajectory. **Same FHIR context, same conversation, different specialist.**
 
 ---
 

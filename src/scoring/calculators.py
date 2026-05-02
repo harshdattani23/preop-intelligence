@@ -15,6 +15,8 @@ from __future__ import annotations
 import math
 from datetime import date
 
+from src.scoring.citations import cite
+
 
 # SNOMED codes
 AFib_CODES = {"49436004"}
@@ -111,6 +113,7 @@ def _calc_cha2ds2vasc(patient, conditions, observations) -> dict:
         "annual_stroke_risk": annual_stroke_risk,
         "factors": factors, "recommendation": recommendation,
         "periop_note": "If patient requires anticoagulation interruption for surgery, assess thromboembolic vs bleeding risk to determine bridging strategy.",
+        "citation": cite("CHA2DS2-VASc"),
     }
 
 
@@ -134,6 +137,7 @@ def _calc_meld(observations) -> dict:
             "score": None, "risk_level": "unable_to_calculate",
             "missing_labs": missing,
             "recommendation": f"Cannot calculate MELD — missing: {', '.join(missing)}",
+            "citation": cite("MELD-Na"),
         }
 
     # Clamp values per MELD formula
@@ -171,6 +175,7 @@ def _calc_meld(observations) -> dict:
         "risk_level": risk, "mortality_estimate": mortality,
         "values_used": {"bilirubin": bilirubin, "creatinine": creatinine, "inr": inr, "sodium": sodium},
         "periop_note": f"MELD {meld_na}: {'Hepatology consultation required before elective surgery.' if meld_na >= 15 else 'Acceptable hepatic risk for surgery.'}",
+        "citation": cite("MELD-Na"),
     }
 
 
@@ -213,6 +218,7 @@ def _calc_wells_dvt(patient, conditions, observations) -> dict:
         "dvt_probability": dvt_probability,
         "factors": factors, "recommendation": recommendation,
         "periop_note": "Pre-operative DVT screening is critical for patients with elevated Wells score. Consider IPC and pharmacologic prophylaxis.",
+        "citation": cite("Wells-DVT"),
     }
 
 
@@ -277,6 +283,7 @@ def _calc_heart(patient, conditions, observations) -> dict:
         "mace_risk_6weeks": mace_risk,
         "factors": factors, "recommendation": recommendation,
         "periop_note": "HEART score ≥4 in pre-op setting warrants cardiology clearance before elective surgery.",
+        "citation": cite("HEART"),
     }
 
 
@@ -334,6 +341,7 @@ def _calc_lemon_airway(patient, conditions, observations) -> dict:
         "risk_points": risk_points, "risk_level": risk,
         "factors": factors, "recommendation": recommendation,
         "periop_note": "LEMON assessment supplements but does not replace bedside airway examination. Mallampati and 3-3-2 evaluation are mandatory before induction.",
+        "citation": cite("LEMON"),
     }
 
 
@@ -356,6 +364,7 @@ def _calc_gcs(observations) -> dict:
             "score": None, "risk_level": "not_documented",
             "recommendation": "GCS not documented in FHIR records. Perform bedside neurological assessment.",
             "periop_note": "GCS assessment is standard for any patient with altered mental status or neurological conditions prior to surgery.",
+            "citation": cite("GCS"),
         }
 
     if total >= 13:
@@ -370,6 +379,7 @@ def _calc_gcs(observations) -> dict:
         "score": total, "max_score": 15, "severity": severity,
         "components": {"eye": gcs_eye, "verbal": gcs_verbal, "motor": gcs_motor},
         "periop_note": f"GCS {total} ({severity}). {'Proceed with standard anesthesia.' if total >= 13 else 'Neurosurgery/neurology consultation required before elective surgery.'}",
+        "citation": cite("GCS"),
     }
 
 
@@ -523,6 +533,7 @@ def _calc_p_possum(patient, conditions, observations, surgery_type) -> dict:
         "risk_level": risk,
         "factors": factors,
         "periop_note": f"P-POSSUM predicts {predicted_mortality}% mortality and {predicted_morbidity}% morbidity. {'Proceed with appropriate monitoring.' if predicted_mortality < 10 else 'Consider ICU bed reservation and discuss risk with patient/family.'}",
+        "citation": cite("P-POSSUM"),
     }
 
 
