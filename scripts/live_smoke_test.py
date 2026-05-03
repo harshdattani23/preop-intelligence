@@ -112,7 +112,10 @@ def send_a2a_message(
     fhir_ctx = {
         FHIR_EXTENSION_KEY: {
             "fhirUrl": HAPI_BASE,
-            "fhirToken": "",
+            # HAPI public sandbox doesn't actually validate bearer tokens, but the
+            # tools' _get_fhir_context rejects empty fhir_token as a missing-context
+            # error. Send a placeholder so the tool layer accepts the call.
+            "fhirToken": "hapi-public-no-auth-required",
             "patientId": patient_id,
         },
     }
