@@ -26,7 +26,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request  # kept for type hints in dispatch signature
 from starlette.responses import JSONResponse
 
-from shared.fhir_hook import extract_fhir_from_payload
+from shared.fhir_hook import extract_fhir_from_payload, fhir_data_var
 from shared.logging_utils import redact_headers, safe_pretty_json
 
 logger = logging.getLogger(__name__)
@@ -113,6 +113,11 @@ class FhirMetadataBridgeASGIApp:
                         new_body = json.dumps(parsed, ensure_ascii=False).encode("utf-8")
                         print(f"[FHIR_METADATA_BRIDGED] key={fhir_key}", flush=True)
                     if fhir_data:
+                        # Stash on the contextvar so fhir_hook.extract_fhir_context
+                        # can read it during the ADK before_model_callback. This
+                        # bypasses ADK's metadata propagation entirely, which is
+                        # unreliable across ADK versions.
+                        fhir_data_var.set(fhir_data)
                         print(f"[FHIR_URL_FOUND] {fhir_data.get('fhirUrl', '[EMPTY]')}", flush=True)
                         print(f"[FHIR_PATIENT_FOUND] {fhir_data.get('patientId', '[EMPTY]')}", flush=True)
                     else:

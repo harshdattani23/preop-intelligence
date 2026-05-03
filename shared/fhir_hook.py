@@ -12,9 +12,18 @@ Metadata key convention (must match the AgentExtension URI in app.py):
         "patientId": "patient-42"
     }
 
+Two transport paths populate `fhir_data_var`:
+  1. The ASGI middleware (FhirMetadataBridgeASGIApp) reads the JSON-RPC body,
+     extracts FHIR context from params.metadata or params.message.metadata,
+     and sets the contextvar BEFORE invoking the inner ADK app.
+  2. As a fallback, this callback also walks callback_context / llm_request to
+     find metadata if the contextvar isn't set (e.g., for callers that bypass
+     the ASGI wrapper).
+
 Set LOG_HOOK_RAW_OBJECTS=true in .env to dump the full llm_request and
 callback_context objects to the log (useful when developing a new integration).
 """
+import contextvars
 import json
 import logging
 import os
@@ -27,6 +36,15 @@ LOG_HOOK_RAW_OBJECTS = os.getenv("LOG_HOOK_RAW_OBJECTS", "false").lower() == "tr
 
 # Must match the AgentExtension URI declared in each agent's app.py.
 FHIR_CONTEXT_KEY = "fhir-context"
+
+# Cross-async-boundary transport for FHIR data extracted by the ASGI middleware.
+# The middleware writes to this contextvar before dispatching the inner app, and
+# extract_fhir_context reads it at the start of every callback invocation.
+# contextvars are scoped to the current async task / request, so concurrent
+# requests get isolated values automatically.
+fhir_data_var: contextvars.ContextVar[dict | None] = contextvars.ContextVar(
+    "fhir_data_var", default=None
+)
 
 
 # ── Private helpers ────────────────────────────────────────────────────────────
@@ -122,6 +140,27 @@ def extract_fhir_context(callback_context, llm_request):
     Returns None (does not modify the LLM request).
     """
     correlation      = _safe_correlation_ids(callback_context, llm_request)
+
+    # Primary path: the ASGI middleware put the FHIR data into a contextvar
+    # before dispatching the inner ADK app. This is the reliable path because
+    # ADK does not consistently surface A2A request metadata through
+    # callback_context — different ADK versions / request shapes put it in
+    # different places, and we cannot rely on any of them.
+    ctx_fhir = fhir_data_var.get()
+    if isinstance(ctx_fhir, dict) and ctx_fhir:
+        callback_context.state["fhir_url"]   = ctx_fhir.get("fhirUrl",   "") or ""
+        callback_context.state["fhir_token"] = ctx_fhir.get("fhirToken", "") or ""
+        callback_context.state["patient_id"] = ctx_fhir.get("patientId", "") or ""
+        print(
+            f"[fhir_hook_contextvar] patient_id={callback_context.state['patient_id']} "
+            f"fhir_url={callback_context.state['fhir_url']}",
+            flush=True,
+        )
+        return None
+
+    # Fallback path: walk the callback_context / llm_request structures in case
+    # the agent is hit by something that bypasses the ASGI wrapper. Kept for
+    # backwards compatibility and defense in depth.
     metadata_sources = _extract_metadata_sources(callback_context, llm_request)
 
     # Walk candidate sources in priority order; use the first non-empty one.
@@ -134,6 +173,11 @@ def extract_fhir_context(callback_context, llm_request):
             break
 
     metadata_keys = list(metadata.keys())
+    print(
+        f"[fhir_hook_fallback] contextvar empty; metadata_source={selected_source} "
+        f"metadata_keys={metadata_keys}",
+        flush=True,
+    )
 
     if LOG_HOOK_RAW_OBJECTS:
         logger.info("hook_raw_llm_request=\n%s", safe_pretty_json(serialize_for_log(llm_request)))
