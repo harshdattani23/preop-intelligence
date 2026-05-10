@@ -17,6 +17,8 @@ LOCAL_PATIENT_MAP = {
     "patient-b": "patient_b_medium_risk.json",
     "patient-c": "patient_c_high_risk.json",
     "patient-d": "patient_d_edge_case.json",
+    "patient-burl": "patient_burl_demo.json",
+    "patient-preop-demo": "patient_preop_demo.json",
 }
 
 # SHARP-on-MCP header names

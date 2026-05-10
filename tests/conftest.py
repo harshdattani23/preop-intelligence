@@ -56,3 +56,27 @@ def fhir_client_local_c():
 def fhir_client_local_d():
     from src.mcp_server.fhir_client import FHIRClient
     return FHIRClient(local_bundle_path=str(DATA_DIR / "patient_d_edge_case.json"))
+
+
+@pytest.fixture
+def patient_burl_bundle() -> dict:
+    with open(DATA_DIR / "patient_burl_demo.json") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def fhir_client_local_burl():
+    from src.mcp_server.fhir_client import FHIRClient
+    return FHIRClient(local_bundle_path=str(DATA_DIR / "patient_burl_demo.json"))
+
+
+@pytest.fixture
+def patient_preop_demo_bundle() -> dict:
+    with open(DATA_DIR / "patient_preop_demo.json") as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def fhir_client_local_preop_demo():
+    from src.mcp_server.fhir_client import FHIRClient
+    return FHIRClient(local_bundle_path=str(DATA_DIR / "patient_preop_demo.json"))

@@ -15,15 +15,25 @@ a2a_app = create_a2a_app(
     agent=root_agent,
     name="postop_monitor",
     description=(
-        "Post-operative monitoring specialist — the second half of a two-agent "
-        "perioperative handoff system. Receives the patient from PreOp Intelligence "
-        "after surgery and continues the same FHIR-grounded conversation. Screens for "
-        "AKI, atrial fibrillation, delirium, pulmonary complications, and SSI; generates "
-        "surgery- and ASA-driven monitoring plans with explicit red-flag thresholds; "
-        "re-doses every active medication for the patient's current renal function. "
-        "Every output is a physician-review draft with an independent verification pass, "
-        "per-section confidence scoring, and source-resource provenance. Aligned with "
-        "SCIP perioperative quality measures and CMS surgical episode-based payment programs."
+        "Post-operative surveillance across all adult surgeries — the downstream half "
+        "of a two-agent A2A perioperative system (PreOp Intelligence → PostOp Monitor). "
+        "Receives the patient from PreOp Intelligence after surgery and continues the "
+        "same FHIR-grounded conversation with the surgery type, ASA class, RCRI score, "
+        "intra-op events, and anticoagulation context already in memory — so post-op "
+        "monitoring is anchored to the pre-op risk profile rather than starting from "
+        "zero. Screens for the four complications driving most post-op morbidity (KDIGO "
+        "AKI, new-onset atrial fibrillation, delirium, pulmonary complications) plus "
+        "the SSI surveillance window; generates surgery- and ASA-driven monitoring "
+        "plans with vitals frequency, lab cadence, telemetry, mobilization milestones, "
+        "and explicit red-flag thresholds; re-computes P-POSSUM mortality + Wells DVT "
+        "+ GCS for ongoing risk stratification; re-doses every active medication for "
+        "the patient's current eGFR (critical after intra-op AKI or contrast exposure); "
+        "parses the operative note (PDF or text) for intra-op events that drive post-op "
+        "monitoring. Every output ships with an independent verification pass — "
+        "per-section confidence (high/medium/low), unverified-area list, source FHIR "
+        "resource IDs as provenance. Physician-review drafts only. Aligned with SCIP "
+        "perioperative quality measures and CMS BPCI-Advanced surgical episode-based "
+        "payment programs."
     ),
     url=os.getenv("POSTOP_AGENT_URL", os.getenv("BASE_URL", "http://localhost:8005")),
     port=8005,

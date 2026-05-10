@@ -122,10 +122,17 @@ Google Cloud Run · GitHub Actions · pytest · ruff · pypdf
 
 ## Judging-criteria cheat sheet (one paragraph each, for the form)
 
-**Innovation:** We're not the first FHIR agent on this marketplace, but we
-are the first to combine literature-cited validated scoring, multimodal
-PDF parsing of prior operative notes, *and* multi-agent composition (preop
-+ postop) in a single conversation. The PDF parser is the unique edge —
+**Innovation:** The only perioperative agent on the marketplace that combines
+all four of: (1) 11 validated risk scores cited from primary literature
+(RCRI from Lee 1999, STOP-BANG from Chung 2008, KDIGO AKI staging, etc.);
+(2) multimodal parsing of prior operative-note PDFs into 7 structured
+finding types; (3) a true preop → postop A2A handoff in a single
+conversation with FHIR context, surgery type, and risk profile preserved
+across the transition; (4) an independent verification pass per output
+with per-section confidence and FHIR resource provenance. Other
+perioperative entries cover narrower slices — SOAR covers one surgery
+(VATS lobectomy) end-to-end with voice UX; Aegis Perioperative Copilot
+computes 4 scores and emits consent. The PDF parser is the unique edge —
 operative notes live in the chart and nobody reads them.
 
 **Technical complexity:** 22 advertised skills across two agents, 11

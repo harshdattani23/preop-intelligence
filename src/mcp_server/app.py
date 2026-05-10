@@ -5,9 +5,16 @@ from fastmcp import FastMCP
 mcp = FastMCP(
     name="PreOp Clinical Risk Toolkit",
     instructions=(
-        "A suite of perioperative risk assessment tools for pre-operative evaluation. "
-        "These tools extract patient data from FHIR, compute validated surgical risk scores, "
-        "check medication safety, assess lab readiness, and evaluate anesthesia considerations. "
+        "Perioperative risk assessment toolkit for pre-operative evaluation across all "
+        "adult surgeries. Computes 11 validated clinical risk scores cited from primary "
+        "literature — ASA, RCRI (Lee TH, Circulation 1999), Caprini VTE, STOP-BANG "
+        "(Chung F, Anesthesiology 2008), CHA₂DS₂-VASc, MELD-Na, Wells, HEART, LEMON, GCS, "
+        "P-POSSUM — plus medication management with hold-date calculation, drug-drug "
+        "interactions, eGFR-based renal dose adjustment, allergy cross-reactivity with "
+        "SCIP-aligned antibiotic prophylaxis, lab readiness, anesthesia considerations, "
+        "imaging assessment, and multimodal prior-operative-note PDF parsing into 7 "
+        "structured finding types. Pairs with the PreOp Intelligence and PostOp Monitor "
+        "A2A agents on Prompt Opinion. Aligned with ACS NSQIP, SCIP, and CMS BPCI-Advanced. "
         "Use get_patient_summary first, then the other tools in parallel."
     ),
 )

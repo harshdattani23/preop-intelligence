@@ -2,7 +2,7 @@
 
 **Two-agent perioperative system: pre-op clearance hands off to post-op monitoring in a single Prompt Opinion conversation.**
 
-> **22 skills across 2 agents · 11 validated scoring systems · every score cited from primary literature · multimodal PDF parsing of prior op notes · dual MCP + A2A transport.** The deepest clinical agent on the Prompt Opinion marketplace — by a factor of 2–3× — and the only one demonstrating multi-agent composition.
+> **22 skills across 2 agents · 11 validated scoring systems cited from primary literature · multimodal PDF parsing of prior op notes · preop → postop A2A handoff in one conversation · independent verification pass with per-section confidence and FHIR provenance · dual MCP + A2A transport.** The deepest perioperative *risk-assessment* agent on the Prompt Opinion marketplace.
 
 Built for the [Agents Assemble](https://agents-assemble.devpost.com/) Healthcare AI Hackathon.
 
@@ -10,12 +10,14 @@ Built for the [Agents Assemble](https://agents-assemble.devpost.com/) Healthcare
 
 | Agent | Skills / tools | Validated scores | Multimodal | Multi-agent | Dual transport |
 |---|---|---|---|---|---|
-| **PreOp + PostOp (us)** | **22 skills across 2 agents** | **11 (all cited)** | ✅ PDF op-notes | ✅ preop→postop handoff | ✅ MCP + A2A |
-| AetherMed Agentic | 5 skills | 0 | ✅ Images + docs | — | — |
-| AnakUnggul (ASD) | 7 skills | 1 (escalation risk) | — | — | — |
-| ALICE + ARIA (prior auth) | 3 skills across 2 agents | 0 | — | partial | — |
-| A2A-MediFlow | 2 skills | 0 | — | — | — |
-| Abuja Clinic Nurse | 1 skill | 0 | — | — | — |
+| **PreOp + PostOp (us)** | **22 skills across 2 agents** | **11 (all cited from primary literature)** | ✅ PDF op-notes | ✅ preop → postop A2A handoff | ✅ MCP + A2A |
+| Aegis Perioperative Copilot (Supervisor + Consent EN + Consent HI) | ~16 skills across 3 agents | 4 (generic guideline citations) | — | ✅ Supervisor → Consent | ✅ MCP + A2A |
+| SOAR (VATS lobectomy co-pilot) | 8 skills | 0 (one-surgery scope) | — | — | — |
+| CareRelay OS (clinical handoffs) | ~12 skills across 4 agents | 0 | — | ✅ | — |
+| AuthBridge (prior auth) | 8 tools | 0 | — | ✅ orchestrator | — |
+| CareTeam AI Orchestrator | 12 skills | 0 | — | ✅ | — |
+| AetherMed Agentic | 5 skills | 0 | ✅ images + docs | — | — |
+| Josanshi (maternal) | 8 skills | 0 | — | partial | — |
 
 Every tool we ship is wired to peer-reviewed literature, and the citation is **inlined into the trace panel JSON** so an anesthesiologist auditing the agent sees `Lee TH, Circulation 1999;100:1043-9` next to the RCRI score. Every recommendation names the exact drug, the exact dose, and the exact date.
 

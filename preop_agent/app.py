@@ -15,15 +15,22 @@ a2a_app = create_a2a_app(
     agent=root_agent,
     name="preop_intelligence",
     description=(
-        "Perioperative risk assessment specialist — the first half of a two-agent "
-        "perioperative handoff system. Generates comprehensive pre-operative "
-        "clearance reports with ASA classification, RCRI cardiac risk, Caprini VTE score, "
-        "STOP-BANG OSA screening, medication management, lab readiness, and anesthesia "
-        "considerations — all from the patient's FHIR record. On completion, hands the "
-        "patient off to the PostOp Monitor agent for surgery-day and post-op surveillance. "
-        "Every output is a physician-review draft with an independent verification pass, "
-        "per-section confidence scoring, and source-resource provenance. Aligned with "
-        "ACS NSQIP risk-adjusted reporting and SCIP perioperative quality measures."
+        "Pre-operative + post-operative risk assessment across all adult surgeries — "
+        "the upstream half of a two-agent A2A perioperative system (PreOp Intelligence "
+        "→ PostOp Monitor). Computes 11 validated clinical risk scores from primary "
+        "literature: ASA, RCRI (Lee TH, Circulation 1999), Caprini VTE, STOP-BANG "
+        "(Chung F, Anesthesiology 2008), CHA₂DS₂-VASc, MELD-Na, Wells, HEART, LEMON, "
+        "GCS, P-POSSUM. Multimodal: parses prior operative-note PDFs into 7 structured "
+        "finding types (difficult airway, allergy severity, intra-op hemodynamics, "
+        "transfusion history, post-op complications). Medication management with "
+        "hold-date calculation from surgery date, drug-drug interactions, eGFR-based "
+        "renal dose adjustment, allergy cross-reactivity, and SCIP-aligned antibiotic "
+        "prophylaxis. Every output ships with an independent verification pass — "
+        "per-section confidence (high/medium/low), unverified-area list, source FHIR "
+        "resource IDs as provenance — and the literature citation for every score. "
+        "Physician-review drafts only. Aligned with ACS NSQIP risk-adjusted reporting, "
+        "SCIP perioperative quality measures, and CMS BPCI-Advanced surgical "
+        "episode-based payment programs."
     ),
     url=os.getenv("PREOP_AGENT_URL", os.getenv("BASE_URL", "http://localhost:8004")),
     port=8004,
@@ -33,13 +40,13 @@ a2a_app = create_a2a_app(
         AgentSkill(
             id="preop-clearance-report",
             name="preop-clearance-report",
-            description="Generate a comprehensive pre-operative clearance assessment with all risk scores, medication review, lab check, and anesthesia evaluation.",
+            description="Generate a comprehensive pre-operative clearance assessment: all 11 validated risk scores with primary-literature citations, medication review with hold-date calculation against the surgery date, lab readiness check, anesthesia evaluation, and the independent verification pass with per-section confidence and FHIR resource provenance.",
             tags=["perioperative", "surgery", "risk-assessment", "fhir"],
         ),
         AgentSkill(
             id="surgical-risk-assessment",
             name="surgical-risk-assessment",
-            description="Calculate ASA, RCRI, Caprini VTE, and STOP-BANG scores for a planned surgery.",
+            description="Calculate the 4 core perioperative scores — ASA, RCRI (Lee TH, Circulation 1999), Caprini VTE, STOP-BANG (Chung F, Anesthesiology 2008) — for a planned surgery. Use alongside advanced-risk-scores for the full set of 11 validated scores.",
             tags=["risk-scores", "cardiac", "vte", "osa"],
         ),
         AgentSkill(
